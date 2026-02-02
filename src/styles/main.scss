@@ -1,3 +1,18 @@
+@import './variables';
+
 body {
   font-family: 'Josefin Sans', sans-serif;
+  background-color: $color-dark;
+  margin-inline: 2rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  margin-block: 2rem;
+  gap: 1rem;
+}
+h1 {
+  color: $color-accent;
+  font-size: 20px;
 }
