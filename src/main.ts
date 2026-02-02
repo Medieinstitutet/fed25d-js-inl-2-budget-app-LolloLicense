@@ -1,3 +1,3 @@
 // @ts-nocheck
-import "./styles/styles.scss";
+import "./styles/style.scss";
 import "./app.js";
