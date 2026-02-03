@@ -19,9 +19,6 @@
       "recommended": true
     }
   },
-  "javascript": {
-    "formatter": {}
-  },
   "assist": {
     "enabled": true,
     "actions": {
