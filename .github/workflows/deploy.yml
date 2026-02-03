@@ -35,7 +35,13 @@ jobs:
         with:
           node-version: 'lts/*'
       - name: Install dependencies
-        run: npm ci
+        run: npm install --foreground-scripts --verbose --no-package-lock
+        continue-on-error: true
+      - name: Print debug log on failure
+        if: failure()
+        run: |
+          ls -a /home/runner/.npm/_logs/
+          cat /home/runner/.npm/_logs/*.log
       - name: Build
         run: npm run build
       - name: Setup Pages
