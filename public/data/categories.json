@@ -1,0 +1,15 @@
+{
+  "income": [
+    { "id": "salary", "label": "Lön", "icon": "wallet" },
+    { "id": "sale", "label": "Säljintäkt", "icon": "circle" },
+    { "id": "lottery", "label": "Lottovinst", "icon": "luckycat" },
+    { "id": "gift", "label": "Gåva", "icon": "gift" }
+  ],
+  "expense": [
+    { "id": "entertainment", "label": "Underhållning", "icon": "shape" },
+    { "id": "food_drink", "label": "Mat & Dryck", "icon": "utensils" },
+    { "id": "clothes_shoes", "label": "Kläder & Skor", "icon": "bag" },
+    { "id": "home_household", "label": "Hus & Hem", "icon": "home" },
+    { "id": "transport_travel", "label": "Fordon & Resor", "icon": "car" }
+  ]
+}

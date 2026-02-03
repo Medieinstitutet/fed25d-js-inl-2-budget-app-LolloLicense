@@ -62,12 +62,99 @@
       <h1>ikapp</h1>
     </header>
     <main>
-      <section>
-        <form action="" class="add-to-budget">
-          <label for="">
-            <input type="radio" name="" />
-          </label>
+      <!-- input area -->
+      <section class="budget-inputs" aria-labelledby="budget-input-title">
+        <h2 id="budget-input-title" class="sr-only">Lägg till budget post</h2>
+        <form class="form-section" id="entry-form" novalidate>
+          <!-- Radiobuttonss -->
+          <fieldset class="entry-type">
+            <legend class="sr-only">Typ</legend>
+            <label>
+              <input type="radio" name="entryType" value="income" id="income-input" checked />
+              Inkomst
+            </label>
+            <label>
+              <input type="radio" name="entryType" value="expense" id="expense-input" />
+              Utgift
+            </label>
+          </fieldset>
+          <!-- Input fields -->
+          <div class="entry-fields">
+            <!-- Entry field amout -->
+            <div class="field amount-field">
+              <label for="amount" class="sr-only">Belopp</label>
+              <input
+                inputmode="decimal"
+                type="number"
+                id="amount"
+                name="amount"
+                min="0"
+                placeholder="SEK"
+                required
+              />
+            </div>
+            <!-- Category field -->
+            <div class="field">
+              <label for="category" class="sr-only">Kategori</label>
+              <select name="category" id="category" required>
+                <option value="" disabled selected>Välj kategori</option>
+              </select>
+            </div>
+            <!-- note field -->
+            <div class="field">
+              <label class="sr-only" for="note">Kommentar</label>
+              <input
+                type="text"
+                id="note"
+                name="note"
+                maxlength="80"
+                placeholder="Kommentar"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="submit-field">
+            <button type="submit" id="add-entry-btn">Lägg till</button>
+          </div>
         </form>
+      </section>
+      <!-- Enry view  -->
+      <section class="entries">
+        <div class="entries-tabs" role="tablist" aria-label="Välj översyn">
+          <button
+            role="tab"
+            id="tab-income"
+            class="entries-tab"
+            aria-controls="panel-income"
+            aria-selected="false"
+          >
+            Inkomster
+          </button>
+
+          <button
+            role="tab"
+            id="tab-expense"
+            class="entries-tab"
+            aria-controls="panel-expense"
+            aria-selected="true"
+          >
+            Utgifter
+          </button>
+        </div>
+        <hr class="entries-divider" />
+        <!-- Income list -->
+        <div id="panel-income" class="entries-panel" role="tabpanel" aria-labelledby="tab-income">
+          <ul id="income-list" class="entries-list"></ul>
+        </div>
+        <!-- Expenses list -->
+        <div id="panel-expense" class="entries-panel" role="tabpanel" aria-labelledby="tab-expense">
+          <ul id="expense-list" class="entries-list"></ul>
+        </div>
+        <hr class="entries-divider" />
+        <div class="entries-total" aria-live="polite">
+          <span class="total-label">Totalt:</span>
+          <span id="total-amount" class="total-amount">0 kr</span>
+        </div>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

@@ -9,10 +9,117 @@ body {
 header {
   display: flex;
   align-items: center;
-  margin-block: 2rem;
-  gap: 2rem;
+  margin: 2rem 0 4rem 0;
+  gap: 0.5rem;
+  h1 {
+    color: $color-accent;
+    font-size: $fs-h4;
+  }
 }
-h1 {
-  color: $color-accent;
-  font-size: 1rem;
+
+// input area
+.budget-inputs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // Radio buttons
+  .entry-type {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 0;
+    padding: 0;
+    margin: 0 0 0 0.5rem;
+    color: $color-light;
+    font-size: $fs-h6;
+  }
+  .entry-fields {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .field input,
+    select {
+      border-radius: 10px;
+      height: 2rem;
+      border: 1px solid $color-light;
+      font-family: 'Josefin Sans';
+      color: $color-light;
+      background-color: $color-dark;
+      padding: 0.5rem;
+      font-size: $fs-body;
+    }
+    select {
+      padding-inline: 0.5rem;
+    }
+    .amount-field {
+      max-width: 3.5rem;
+    }
+  }
+  .submit-field {
+    display: flex;
+    justify-content: flex-end;
+    margin-block: 1rem;
+    button {
+      border-radius: 10px;
+      font-family: 'Josefin Sans';
+      padding: 0.6rem;
+      border: none;
+      background-color: $color-accent;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+  }
+
+  // Extra styles for form
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* Firefox */
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+//Entrys
+.entries-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  color: $color-light;
+  font-size: 20px;
+  margin-bottom: 1rem;
+  .entry-column-1 {
+    display: flex;
+    gap: 1rem;
+  }
+  .entry-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    .entry-meta {
+      font-weight: 200;
+
+      .entry-date {
+        color: $color-grey;
+        font-size: 1rem;
+      }
+    }
+  }
+  .entry-column-2 {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+
+    button {
+      background: none;
+      border: none;
+    }
+  }
 }
