@@ -1,26 +1,30 @@
 //---------------------------------------------------------
-// -------------------------STATE--------------------------
+//--------------------------STATE--------------------------
 //---------------------------------------------------------
+
 let categories = null;
+//localStorage
+const LS_DB_ID = "ikapp_entries";
 // data
 const state = {
   entries: [],
   activeTab: "expense",
 };
 //-----------------------------------------------------------
-// -------------------------HELPERS--------------------------
+//--------------------------HELPERS--------------------------
 //-----------------------------------------------------------
+
 //Create the date of added postentry
 function getTodayDate() {
-  return new Date().toISOString();
+  return new Date().toDateString();
 }
 //Making the date pretty and swedish
-function formatDate(isoString) {
-  const date = new Date(isoString);
+function formatDate(dateString) {
+  const date = new Date(dateString);
   return date.toLocaleDateString("sv-SE", {
-    year: "numeric",
-    month: "short",
+    month: "numeric",
     day: "numeric",
+    year: "numeric",
   });
 }
 // generate ID for deletepost function
@@ -33,8 +37,41 @@ function findCategoryById(categoryId) {
     (category) => category.id === categoryId,
   );
 }
+//reset entryfields(inputs/select) to default
+function resetEntryFields(form) {
+  const amountInput = form.querySelector("#amount");
+  const categorySelect = form.querySelector("#category");
+  const noteInput = form.querySelector("#note");
+
+  if (amountInput) amountInput.value = "";
+  if (noteInput) noteInput.value = "";
+  if (categorySelect) categorySelect.selectedIndex = 0;
+}
+
 //-----------------------------------------------------------
-// ------------------------UI FUNCTIONS----------------------
+//-----------------------LOCAL STORAGE STUFF-----------------
+//-----------------------------------------------------------
+
+// make enteries array to string function
+function saveEntriesToLocalStorage() {
+  //acuallay makes the string
+  const stringified = JSON.stringify(state.entries);
+  // saves the strin
+  localStorage.setItem(LS_DB_ID, stringified);
+}
+// takes the string and reverse it backs to array
+function loadEntriesFromLocalStorage() {
+  const saved = localStorage.getItem(LS_DB_ID);
+  // if nothing is saved - return/stop
+  if (saved === null) {
+    return;
+  }
+  // parse = makes string to array with objects
+  state.entries = JSON.parse(saved);
+}
+
+//-----------------------------------------------------------
+//-------------------------UI FUNCTIONS----------------------
 //-----------------------------------------------------------
 
 //Radiobuttons
@@ -77,6 +114,36 @@ function initFormSubmit() {
 
   form.addEventListener("submit", onFormSubmit);
 }
+
+// function for delete buttons - event delegation
+// listitems renders by js therefor this function
+function initDeleteBtns() {
+  const incomeList = document.querySelector("#income-list");
+  const expenseList = document.querySelector("#expense-list");
+
+  if (incomeList) incomeList.addEventListener("click", onDeleteClick);
+  if (expenseList) expenseList.addEventListener("click", onDeleteClick);
+}
+function onDeleteClick(e) {
+  const btn = e.target.closest(".entry-delete");
+  if (!btn) return;
+
+  const li = btn.closest("li");
+  if (!li) return;
+
+  const entryId = li.dataset.id;
+  if (!entryId) return;
+
+  deleteEntryById(entryId);
+}
+//removes the deleted entry from state + saves + rerenders
+function deleteEntryById(entryId) {
+  state.entries = state.entries.filter((entry) => entry.id !== entryId);
+
+  saveEntriesToLocalStorage();
+  renderAllEntries();
+  updateTotalAmount();
+}
 // what to pull from submitted entry
 function onFormSubmit(event) {
   event.preventDefault();
@@ -106,9 +173,86 @@ function onFormSubmit(event) {
 
   state.entries.push(entry);
   renderEntry(entry);
-
-  console.log("Ny entry:", entry);
+  saveEntriesToLocalStorage();
+  updateTotalAmount();
+  //   console.log("Ny entry:", entry);
+  resetEntryFields(form);
 }
+// Totalamout function conects to the chosen type(income/expense)
+function getTotalAmountForType(type) {
+  return state.entries
+    .filter((entry) => entry.type === type)
+    .reduce((sum, entry) => sum + entry.amount, 0);
+}
+// updating total amount and adds class for UX
+function updateTotalAmount() {
+  const totalEl = document.querySelector("#total-amount");
+  if (!totalEl) return;
+
+  const total = getTotalAmountForType(state.activeTab);
+  const prefix = state.activeTab === "expense" ? "-" : "";
+  totalEl.textContent = `${prefix}${total}kr`;
+
+  totalEl.classList.toggle("is-income", state.activeTab === "income");
+  totalEl.classList.toggle("is-expense", state.activeTab === "expense");
+}
+
+// show/hide tabs+panels depending witch is chosen
+function updateTabsUI() {
+  const incomeTab = document.querySelector("#tab-income");
+  const expenseTab = document.querySelector("#tab-expense");
+  const incomePanel = document.querySelector("#panel-income");
+  const expensePanel = document.querySelector("#panel-expense");
+
+  // state
+  const isIncome = state.activeTab === "income";
+  const isExpense = state.activeTab === "expense";
+
+  if (incomeTab) incomeTab.setAttribute("aria-selected", String(isIncome));
+  if (expenseTab) expenseTab.setAttribute("aria-selected", String(isExpense));
+  //styling
+  if (incomeTab) incomeTab.classList.toggle("is-active", isIncome);
+  if (expenseTab) expenseTab.classList.toggle("is-active", isExpense);
+
+  const entriesEl = document.querySelector(".entries");
+  if (entriesEl) {
+    entriesEl.classList.toggle("is-income-active", isIncome);
+    entriesEl.classList.toggle("is-expense-active", isExpense);
+  }
+  // show / hide panels
+  if (incomePanel) incomePanel.classList.toggle("is-hidden", !isIncome);
+  if (expensePanel) expensePanel.classList.toggle("is-hidden", !isExpense);
+
+  // hidden attribute
+  if (incomePanel) incomePanel.toggleAttribute("hidden", !isIncome);
+  if (expensePanel) expensePanel.toggleAttribute("hidden", !isExpense);
+
+  updateTotalAmount();
+}
+
+// sets clickevent to typetabs
+function initTabs() {
+  const incomeTab = document.querySelector("#tab-income");
+  const expenseTab = document.querySelector("#tab-expense");
+
+  if (incomeTab) {
+    incomeTab.addEventListener("click", () => {
+      state.activeTab = "income";
+      updateTabsUI();
+    });
+  }
+  if (expenseTab) {
+    expenseTab.addEventListener("click", () => {
+      state.activeTab = "expense";
+      updateTabsUI();
+    });
+  }
+  updateTabsUI();
+}
+
+//-----------------------------------------------------------
+//-------------------------RENDER UI-------------------------
+//-----------------------------------------------------------
 
 // Render list by chosen category
 function renderEntry(entry) {
@@ -141,7 +285,7 @@ function renderEntry(entry) {
         </div>
     </div>    
     <div class="entry-column-2">
-        <span class="entry-amount">${entry.type === "expense" ? "-" : ""}${entry.amount} kr</span>
+        <span class="entry-amount">${entry.type === "expense" ? "-" : ""}${entry.amount}kr</span>
         <button type="button" class="entry-delete" aria-label="Radera post">
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.6875 3.83333L11.9831 13.9517C11.9539 14.3722 11.7704 14.7657 11.4697 15.053C11.1689 15.3403 10.7731 15.5 10.3621 15.5H3.63787C3.22686 15.5 2.83112 15.3403 2.53034 15.053C2.22957 14.7657 2.04612 14.3722 2.01694 13.9517L1.3125 3.83333M5.375 7.16667V12.1667M8.625 7.16667V12.1667M9.4375 3.83333V1.33333C9.4375 1.11232 9.3519 0.900358 9.19952 0.744078C9.04715 0.587797 8.84049 0.5 8.625 0.5H5.375C5.15951 0.5 4.95285 0.587797 4.80048 0.744078C4.6481 0.900358 4.5625 1.11232 4.5625 1.33333V3.83333M0.5 3.83333H13.5" stroke="#FEFEFE" stroke-linecap="round" stroke-linejoin="round"/>
@@ -151,9 +295,23 @@ function renderEntry(entry) {
     `;
   listEl.appendChild(li);
 }
+// Render list after its loaded to local storage
+function renderAllEntries() {
+  const incomeList = document.querySelector("#income-list");
+  const expenseList = document.querySelector("#expense-list");
+  // if empty list - return
+  if (!incomeList || !expenseList) return;
+  // emptys list so we dont have two of the same
+  incomeList.innerHTML = "";
+  expenseList.innerHTML = "";
+  // renders all after checking all
+  state.entries.forEach((entry) => {
+    renderEntry(entry);
+  });
+}
 
 //-----------------------------------------------------------
-// -------------------------INITS & FETCH--------------------
+//-------------------------INITS & FETCH---------------------
 //-----------------------------------------------------------
 
 fetch(`${import.meta.env.BASE_URL}data/categories.json`)
@@ -162,6 +320,12 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     categories = data;
     initCategorySwitch();
     initFormSubmit();
+    initDeleteBtns();
+
+    loadEntriesFromLocalStorage();
+    renderAllEntries();
+    initTabs();
+    updateTotalAmount();
   })
   .catch((err) => {
     console.error("Kunde inte ladda categories.json", err);

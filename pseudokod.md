@@ -14,13 +14,16 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 - En listan med budgetposter: id, typ(inkomst/utgift), belopp, text, kategori, datum
   där utgifter kontra inkomster får olika färg ett månadshjul där inkomster har en färg, utgiften en andra färg och pengar kvar en färg (som en sammanställning)
   --> Output
-- måndagshjul / balans ui kompatibelt (om tid finns)
+- månadshjul / balans ui kompatibelt (om tid finns)
 - Lista med alla poster
 - balans i skrift ( >=0 / <0)
 
 ## Interaktion
-
+- välj månad uppe i en swiper
+  - delfault är kopplat till dagens datum 
 - lägg till inkomst / utgift
+- Efter submit av ny post ska inputs återställas till default
+- en list med entry posts renderas 
 - ta bort poster
 - sparas så att appen inte startar om på noll (localStorage)
 - hämta info från localStorage vid varje reload
