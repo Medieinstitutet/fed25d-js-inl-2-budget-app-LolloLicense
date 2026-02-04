@@ -8,7 +8,7 @@ const LS_DB_ID = "ikapp_entries";
 // data
 const state = {
   entries: [],
-  activeTab: "expense",
+  activeTab: "income",
 };
 //-----------------------------------------------------------
 //--------------------------HELPERS--------------------------
