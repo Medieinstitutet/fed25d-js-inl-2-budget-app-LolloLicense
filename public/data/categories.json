@@ -12,5 +12,9 @@
     { "id": "home_household", "label": "Hus & Hem", "icon": "home" },
     { "id": "transport_travel", "label": "Fordon & Resor", "icon": "car" }
   ],
-  "savings": [{ "id": "savings", "label": "Sparande", "icon": "save" }]
+  "savings": [
+    { "id": "pension", "label": "Pension", "icon": "save" },
+    { "id": "emergency", "label": "Kriskonto", "icon": "save" },
+    { "id": "dream", "label": "Drömkonto", "icon": "save" }
+  ]
 }

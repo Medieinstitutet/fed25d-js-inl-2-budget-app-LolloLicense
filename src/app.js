@@ -33,9 +33,11 @@ function generateId() {
 }
 // Set Category ID
 function findCategoryById(categoryId) {
-  return [...categories.income, ...categories.expense].find(
-    (category) => category.id === categoryId,
-  );
+  return [
+    ...categories.income,
+    ...categories.expense,
+    ...categories.savings,
+  ].find((category) => category.id === categoryId);
 }
 //reset entryfields(inputs/select) to default
 function resetEntryFields(form) {
@@ -131,9 +133,11 @@ function initFormSubmit() {
 function initDeleteBtns() {
   const incomeList = document.querySelector("#income-list");
   const expenseList = document.querySelector("#expense-list");
+  const savingsList = document.querySelector("#savings-list");
 
   if (incomeList) incomeList.addEventListener("click", onDeleteClick);
   if (expenseList) expenseList.addEventListener("click", onDeleteClick);
+  if (savingsList) expenseList.addEventListener("click", onDeleteClick);
 }
 function onDeleteClick(e) {
   const btn = e.target.closest(".entry-delete");
@@ -154,6 +158,7 @@ function deleteEntryById(entryId) {
   saveEntriesToLocalStorage();
   renderAllEntries();
   updateTotalAmount();
+  updateBalanceSummary();
 }
 // what to pull from submitted entry
 function onFormSubmit(event) {
@@ -167,7 +172,7 @@ function onFormSubmit(event) {
   const note = String(fd.get("note") || "");
 
   // validation
-  const typeOk = type === "income" || type === "expense";
+  const typeOk = type === "income" || type === "expense" || type === "savings";
   const amountOk = Number.isFinite(amount) && amount > 0;
   const categoryOk = categoryId !== "";
 
@@ -186,6 +191,7 @@ function onFormSubmit(event) {
   renderEntry(entry);
   saveEntriesToLocalStorage();
   updateTotalAmount();
+  updateBalanceSummary();
   //   console.log("Ny entry:", entry);
   resetEntryFields(form);
 }
@@ -194,6 +200,42 @@ function getTotalAmountForType(type) {
   return state.entries
     .filter((entry) => entry.type === type)
     .reduce((sum, entry) => sum + entry.amount, 0);
+}
+// Balans summary
+function formatMoney(amount) {
+  return `${amount}kr`;
+}
+
+function updateBalanceSummary() {
+  const saldoEl = document.querySelector("#balance-saldo");
+  const expenseEl = document.querySelector("#balance-expense");
+  const savingsEl = document.querySelector("#balance-savings");
+  if (!saldoEl && !expenseEl && !savingsEl) return;
+
+  //getting the amounts from getTotalAmount function
+  const incomeTotal = getTotalAmountForType("income");
+  const expenseTotal = getTotalAmountForType("expense");
+  const savingsTotal = getTotalAmountForType("savings");
+
+  // calc the saldo
+  const saldo = incomeTotal - expenseTotal - savingsTotal;
+
+  //toggle for css / UX
+  if (saldoEl) {
+    saldoEl.textContent = formatMoney(saldo);
+    saldoEl.classList.toggle("is-positive", saldo > 0);
+    saldoEl.classList.toggle("is-negative", saldo < 0);
+  }
+
+  // formatting negative value UX
+  if (expenseEl) {
+    expenseEl.textContent = `-${formatMoney(expenseTotal)}`;
+    expenseEl.classList.add("is-negative");
+  }
+  // svaings output
+  if (savingsEl) {
+    savingsEl.textContent = formatMoney(savingsTotal);
+  }
 }
 // updating total amount and adds class for UX
 function updateTotalAmount() {
@@ -206,37 +248,46 @@ function updateTotalAmount() {
 
   totalEl.classList.toggle("is-income", state.activeTab === "income");
   totalEl.classList.toggle("is-expense", state.activeTab === "expense");
+  totalEl.classList.toggle("is-savings", state.activeTab === "savings");
 }
 
 // show/hide tabs+panels depending witch is chosen
 function updateTabsUI() {
   const incomeTab = document.querySelector("#tab-income");
   const expenseTab = document.querySelector("#tab-expense");
+  const savingsTab = document.querySelector("#tab-savings");
   const incomePanel = document.querySelector("#panel-income");
   const expensePanel = document.querySelector("#panel-expense");
+  const savingsPanel = document.querySelector("#panel-savings");
 
   // state
   const isIncome = state.activeTab === "income";
   const isExpense = state.activeTab === "expense";
+  const isSavings = state.activeTab === "savings";
 
   if (incomeTab) incomeTab.setAttribute("aria-selected", String(isIncome));
   if (expenseTab) expenseTab.setAttribute("aria-selected", String(isExpense));
+  if (savingsTab) savingsTab.setAttribute("aria-selected", String(isSavings));
   //styling
   if (incomeTab) incomeTab.classList.toggle("is-active", isIncome);
   if (expenseTab) expenseTab.classList.toggle("is-active", isExpense);
+  if (savingsTab) savingsTab.classList.toggle("is-active", isSavings);
 
   const entriesEl = document.querySelector(".entries");
   if (entriesEl) {
     entriesEl.classList.toggle("is-income-active", isIncome);
     entriesEl.classList.toggle("is-expense-active", isExpense);
+    entriesEl.classList.toggle("is-savings-active", isSavings);
   }
   // show / hide panels
   if (incomePanel) incomePanel.classList.toggle("is-hidden", !isIncome);
   if (expensePanel) expensePanel.classList.toggle("is-hidden", !isExpense);
+  if (savingsPanel) savingsPanel.classList.toggle("is-hidden", !isSavings);
 
   // hidden attribute
   if (incomePanel) incomePanel.toggleAttribute("hidden", !isIncome);
   if (expensePanel) expensePanel.toggleAttribute("hidden", !isExpense);
+  if (savingsPanel) savingsPanel.toggleAttribute("hidden", !isSavings);
 
   updateTotalAmount();
 }
@@ -245,6 +296,7 @@ function updateTabsUI() {
 function initTabs() {
   const incomeTab = document.querySelector("#tab-income");
   const expenseTab = document.querySelector("#tab-expense");
+  const savingsTab = document.querySelector("#tab-savings");
 
   if (incomeTab) {
     incomeTab.addEventListener("click", () => {
@@ -255,6 +307,12 @@ function initTabs() {
   if (expenseTab) {
     expenseTab.addEventListener("click", () => {
       state.activeTab = "expense";
+      updateTabsUI();
+    });
+  }
+  if (savingsTab) {
+    savingsTab.addEventListener("click", () => {
+      state.activeTab = "savings";
       updateTabsUI();
     });
   }
@@ -270,7 +328,9 @@ function renderEntry(entry) {
   const listEl =
     entry.type === "income"
       ? document.querySelector("#income-list")
-      : document.querySelector("#expense-list");
+      : entry.type === "expense"
+        ? document.querySelector("#expense-list")
+        : document.querySelector("#savings-list");
   if (!listEl) return;
 
   const category = findCategoryById(entry.categoryId);
@@ -310,11 +370,13 @@ function renderEntry(entry) {
 function renderAllEntries() {
   const incomeList = document.querySelector("#income-list");
   const expenseList = document.querySelector("#expense-list");
+  const savingsList = document.querySelector("#savings-list");
   // if empty list - return
-  if (!incomeList || !expenseList) return;
+  if (!incomeList || !expenseList || !savingsList) return;
   // emptys list so we dont have two of the same
   incomeList.innerHTML = "";
   expenseList.innerHTML = "";
+  savingsList.innerHTML = "";
   // renders all after checking all
   state.entries.forEach((entry) => {
     renderEntry(entry);
@@ -337,6 +399,7 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     renderAllEntries();
     initTabs();
     updateTotalAmount();
+    updateBalanceSummary();
   })
   .catch((err) => {
     console.error("Kunde inte ladda categories.json", err);
