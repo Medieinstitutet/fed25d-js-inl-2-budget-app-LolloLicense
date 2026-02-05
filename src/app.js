@@ -49,6 +49,18 @@ function resetEntryFields(form) {
   if (noteInput) noteInput.value = "";
   if (categorySelect) categorySelect.selectedIndex = 0;
 }
+// Formatting amouts
+function formatMoney(amount) {
+  if (!Number.isFinite(amount)) return "0 kr";
+
+  const rounded = Math.round(amount);
+
+  // formatting number to show thousands as 1 000kr
+  const formatted = Math.abs(rounded).toLocaleString("sv-SE");
+
+  const sign = rounded < 0 ? "-" : "";
+  return `${sign}${formatted} kr`;
+}
 
 //-----------------------------------------------------------
 //-----------------------LOCAL STORAGE STUFF-----------------
@@ -137,7 +149,7 @@ function initDeleteBtns() {
 
   if (incomeList) incomeList.addEventListener("click", onDeleteClick);
   if (expenseList) expenseList.addEventListener("click", onDeleteClick);
-  if (savingsList) expenseList.addEventListener("click", onDeleteClick);
+  if (savingsList) savingsList.addEventListener("click", onDeleteClick);
 }
 function onDeleteClick(e) {
   const btn = e.target.closest(".entry-delete");
@@ -202,10 +214,6 @@ function getTotalAmountForType(type) {
     .reduce((sum, entry) => sum + entry.amount, 0);
 }
 // Balans summary
-function formatMoney(amount) {
-  return `${amount}kr`;
-}
-
 function updateBalanceSummary() {
   const saldoEl = document.querySelector("#balance-saldo");
   const expenseEl = document.querySelector("#balance-expense");
@@ -229,7 +237,7 @@ function updateBalanceSummary() {
 
   // formatting negative value UX
   if (expenseEl) {
-    expenseEl.textContent = `-${formatMoney(expenseTotal)}`;
+    expenseEl.textContent = `- ${formatMoney(Math.abs(expenseTotal))}`;
     expenseEl.classList.add("is-negative");
   }
   // svaings output
@@ -243,8 +251,11 @@ function updateTotalAmount() {
   if (!totalEl) return;
 
   const total = getTotalAmountForType(state.activeTab);
-  const prefix = state.activeTab === "expense" ? "-" : "";
-  totalEl.textContent = `${prefix}${total}kr`;
+  if (state.activeTab === "expense") {
+    totalEl.textContent = `-${formatMoney(total)}`;
+  } else {
+    totalEl.textContent = formatMoney(total);
+  }
 
   totalEl.classList.toggle("is-income", state.activeTab === "income");
   totalEl.classList.toggle("is-expense", state.activeTab === "expense");
@@ -356,7 +367,7 @@ function renderEntry(entry) {
         </div>
     </div>    
     <div class="entry-column-2">
-        <span class="entry-amount">${entry.type === "expense" ? "-" : ""}${entry.amount}kr</span>
+        <span class="entry-amount">${entry.type === "expense" ? "- " : ""}${formatMoney(Math.abs(entry.amount))}</span>
         <button type="button" class="entry-delete" aria-label="Radera post">
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.6875 3.83333L11.9831 13.9517C11.9539 14.3722 11.7704 14.7657 11.4697 15.053C11.1689 15.3403 10.7731 15.5 10.3621 15.5H3.63787C3.22686 15.5 2.83112 15.3403 2.53034 15.053C2.22957 14.7657 2.04612 14.3722 2.01694 13.9517L1.3125 3.83333M5.375 7.16667V12.1667M8.625 7.16667V12.1667M9.4375 3.83333V1.33333C9.4375 1.11232 9.3519 0.900358 9.19952 0.744078C9.04715 0.587797 8.84049 0.5 8.625 0.5H5.375C5.15951 0.5 4.95285 0.587797 4.80048 0.744078C4.6481 0.900358 4.5625 1.11232 4.5625 1.33333V3.83333M0.5 3.83333H13.5" stroke="#FEFEFE" stroke-linecap="round" stroke-linejoin="round"/>
