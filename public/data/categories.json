@@ -11,5 +11,6 @@
     { "id": "clothes_shoes", "label": "Kläder & Skor", "icon": "bag" },
     { "id": "home_household", "label": "Hus & Hem", "icon": "home" },
     { "id": "transport_travel", "label": "Fordon & Resor", "icon": "car" }
-  ]
+  ],
+  "savings": [{ "id": "savings", "label": "Sparande", "icon": "save" }]
 }

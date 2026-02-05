@@ -18,12 +18,11 @@
       name="description"
       content="ikapp gör det lätt att följa din ekonomi. Logga det du spenderar och tjänar, håll ordning med kategorier och se en klar översikt direkt."
     />
-    <meta property="og:image" content="/logo-small.svg" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ikAPP</title>
   </head>
   <body>
+    <!-- Site header -->
     <header>
       <a href="#">
         <svg
@@ -69,6 +68,7 @@
       </a>
       <h1>ikapp</h1>
     </header>
+    <!-- Main content -->
     <main>
       <!-- input area -->
       <section class="budget-inputs" aria-labelledby="budget-input-title">
@@ -84,6 +84,10 @@
             <label>
               <input type="radio" name="entryType" value="expense" id="expense-input" />
               Utgift
+            </label>
+            <label>
+              <input type="radio" name="entryType" value="savings" id="savings-input" />
+              Sparande
             </label>
           </fieldset>
           <!-- Input fields -->

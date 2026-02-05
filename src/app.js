@@ -77,8 +77,13 @@ function loadEntriesFromLocalStorage() {
 //Radiobuttons
 function getCheckedEntryType() {
   const checked = document.querySelector('input[name="entryType"]:checked');
-  return checked && checked.value === "expense" ? "expense" : "income";
+  const value = checked ? checked.value : "income";
+
+  return value === "income" || value === "expense" || value === "savings"
+    ? value
+    : "income";
 }
+
 // get right categorylist for chosen radiobtn
 function fillCategorySelect(type) {
   const select = document.querySelector("#category");
@@ -88,7 +93,12 @@ function fillCategorySelect(type) {
   select.innerHTML =
     '<option value="" disabled selected>Välj Kategori </option>';
 
-  const list = type === "income" ? categories.income : categories.expense;
+  const list =
+    type === "income"
+      ? categories.income
+      : type === "expense"
+        ? categories.expense
+        : categories.savings;
 
   list.forEach((category) => {
     const option = document.createElement("option");
@@ -97,6 +107,7 @@ function fillCategorySelect(type) {
     select.appendChild(option);
   });
 }
+
 function initCategorySwitch() {
   fillCategorySelect(getCheckedEntryType());
 
