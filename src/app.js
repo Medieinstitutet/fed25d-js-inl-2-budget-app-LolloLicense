@@ -141,10 +141,6 @@ function isEntryInViewedPeriod(entry) {
   );
 }
 
-//-----------------------------------------------------------
-//---------------------PERIOD MODE EVENTS--------------------
-//-----------------------------------------------------------
-
 // add click evenet to modebuttons in header
 function initPeriodModeBtns() {
   const btns = document.querySelectorAll(".mode-btn");
@@ -166,6 +162,46 @@ function initPeriodModeBtns() {
       refreshUIforPeriodChange();
     });
   });
+}
+// Period nav Helpers
+
+// changes periodlabel state
+function changeViewdPeriod(direction) {
+  // if we chose year jump year/year on click
+  if (state.periodMode === "year") {
+    state.periodYear += direction;
+    return;
+  }
+  // Monthly jumps on click
+  state.periodMonth += direction;
+  //if we go back monthly to a different year > change year buy -1
+  if (state.periodMonth < 0) {
+    state.periodMonth = 11;
+    state.periodYear -= 1;
+  }
+  //if we go forward monthly to a different year > change year buy +1
+  if (state.periodMonth > 11) {
+    state.periodMonth = 0;
+    state.periodYear += 1;
+  }
+}
+// connection the buttons to to period state
+function initPeriodNavbtns() {
+  const prevBtn = document.querySelector("#period-prev");
+  const nextBtn = document.querySelector("#period-next");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      changeViewdPeriod(-1); //going back one step
+      updatePeriodLabel();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      changeViewdPeriod(+1); //going forward one step
+      updatePeriodLabel();
+    });
+  }
 }
 
 //-----------------------------------------------------------
@@ -567,6 +603,7 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     updateBalanceSummary();
     updatePeriodLabel();
     initPeriodModeBtns();
+    initPeriodNavbtns();
   })
   .catch((err) => {
     console.error("Kunde inte ladda categories.json", err);
