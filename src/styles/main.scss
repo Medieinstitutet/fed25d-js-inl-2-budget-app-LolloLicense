@@ -143,6 +143,7 @@ main {
       margin-top: 1rem;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
       width: 100%;
       flex-wrap: wrap;
@@ -169,6 +170,10 @@ main {
       }
       .amount-field {
         flex: 0 0 5.5rem;
+        max-width: 5rem;
+      }
+      .category {
+        min-width: 10.5rem;
       }
     }
     .submit-field {

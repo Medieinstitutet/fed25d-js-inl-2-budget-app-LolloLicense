@@ -173,6 +173,13 @@
             </fieldset>
             <!-- Input fields -->
             <div class="entry-fields">
+              <!-- Category field -->
+              <div class="field">
+                <label for="category" class="sr-only">Kategori</label>
+                <select class="category" name="category" id="category" required>
+                  <option value="" disabled selected>Välj kategori</option>
+                </select>
+              </div>
               <!-- Entry field amout -->
               <div class="field amount-field">
                 <label for="amount" class="sr-only">Belopp</label>
@@ -187,17 +194,11 @@
                   required
                 />
               </div>
-              <!-- Category field -->
-              <div class="field">
-                <label for="category" class="sr-only">Kategori</label>
-                <select name="category" id="category" required>
-                  <option value="" disabled selected>Välj kategori</option>
-                </select>
-              </div>
               <!-- note field -->
               <div class="field">
                 <label class="sr-only" for="note">Kommentar</label>
                 <input
+                  class="note"
                   type="text"
                   id="note"
                   name="note"
