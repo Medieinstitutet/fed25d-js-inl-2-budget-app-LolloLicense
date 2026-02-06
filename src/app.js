@@ -69,7 +69,10 @@ function formatMoney(amount) {
 
 // Create a stabil date string
 function formatDateKey(date) {
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 //Create the date of added postentry
 function getTodayDate() {
@@ -164,9 +167,27 @@ function initPeriodModeBtns() {
   });
 }
 // Period nav Helpers
+// connection the buttons to to period state
+function initPeriodNavbtns() {
+  const prevBtn = document.querySelector("#period-prev");
+  const nextBtn = document.querySelector("#period-next");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      changeViewedPeriod(-1); //going back one step
+      refreshUIforPeriodChange();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      changeViewedPeriod(+1); //going forward one step
+      refreshUIforPeriodChange();
+    });
+  }
+}
 
 // changes periodlabel state
-function changeViewdPeriod(direction) {
+function changeViewedPeriod(direction) {
   // if we chose year jump year/year on click
   if (state.periodMode === "year") {
     state.periodYear += direction;
@@ -183,24 +204,6 @@ function changeViewdPeriod(direction) {
   if (state.periodMonth > 11) {
     state.periodMonth = 0;
     state.periodYear += 1;
-  }
-}
-// connection the buttons to to period state
-function initPeriodNavbtns() {
-  const prevBtn = document.querySelector("#period-prev");
-  const nextBtn = document.querySelector("#period-next");
-
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => {
-      changeViewdPeriod(-1); //going back one step
-      updatePeriodLabel();
-    });
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      changeViewdPeriod(+1); //going forward one step
-      updatePeriodLabel();
-    });
   }
 }
 
@@ -221,17 +224,25 @@ function loadEntriesFromLocalStorage() {
   if (saved === null) return;
 
   const parsed = JSON.parse(saved);
-
+  // always sends back a list with entries no undefined
   state.entries = parsed.map((entry) => {
-    // Om createdAt redan är YYYY-MM-DD, behåll.
-    // Annars: försök parse:a och normalisera till YYYY-MM-DD.
-    const date = new Date(entry.createdAt);
+    const createdAt = String(entry.createdAt || "");
+
+    //checking so the dates is ok
+    const looksLikeDateKey = /^\d{4}-\d{2}-\d{2}$/.test(createdAt);
+    //if format ok - keep going
+    if (looksLikeDateKey) {
+      return {
+        ...entry,
+        createdAt,
+      };
+    }
+    //if wrong tell me
+    console.warn("createdAt var inte YYYY-MM-DD, fixar:", entry.createdAt);
 
     return {
       ...entry,
-      createdAt: Number.isNaN(date.getTime())
-        ? getTodayDate()
-        : formatDateKey(date),
+      createdAt: getTodayDate(),
     };
   });
 }
@@ -303,6 +314,7 @@ function initDeleteBtns() {
   if (expenseList) expenseList.addEventListener("click", onDeleteClick);
   if (savingsList) savingsList.addEventListener("click", onDeleteClick);
 }
+// Delete post
 function onDeleteClick(e) {
   const btn = e.target.closest(".entry-delete");
   if (!btn) return;
@@ -317,12 +329,12 @@ function onDeleteClick(e) {
 }
 //removes the deleted entry from state + saves + rerenders
 function deleteEntryById(entryId) {
+  // removes the post from state
   state.entries = state.entries.filter((entry) => entry.id !== entryId);
-
+  //Save to local storage
   saveEntriesToLocalStorage();
-  renderAllEntries();
-  updateTotalAmount();
-  updateBalanceSummary();
+  //Updating UI ( list+ total amount + overview + periodlabel)
+  refreshUIforPeriodChange();
 }
 // what to pull from submitted entry
 function onFormSubmit(event) {
@@ -356,12 +368,13 @@ function onFormSubmit(event) {
     note,
     createdAt,
   };
-
+  // ad post to state
   state.entries.push(entry);
-  renderEntry(entry);
+  // save to local storage
   saveEntriesToLocalStorage();
-  updateTotalAmount();
-  updateBalanceSummary();
+  //Updating UI ( list+ total amount + overview + periodlabel)
+  refreshUIforPeriodChange();
+  //Clear the form fields
   resetEntryFields(form);
 }
 // Totalamout function conects to the chosen type(income/expense)
@@ -514,6 +527,12 @@ function initTabs() {
 
 //  INIT FUNCTION FOR UI
 function refreshUIforPeriodChange() {
+  console.log(
+    "refresh körs:",
+    state.periodYear,
+    state.periodMonth,
+    state.periodMode,
+  );
   renderAllEntries();
   updateTotalAmount();
   updateBalanceSummary();
@@ -597,11 +616,9 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     initDeleteBtns();
 
     loadEntriesFromLocalStorage();
-    renderAllEntries();
+
     initTabs();
-    updateTotalAmount();
-    updateBalanceSummary();
-    updatePeriodLabel();
+    refreshUIforPeriodChange();
     initPeriodModeBtns();
     initPeriodNavbtns();
   })
