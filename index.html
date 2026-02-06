@@ -2,8 +2,8 @@
 <html lang="sv">
   <head>
     <meta charset="UTF-8" />
-    <!-- Icon -->
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <!-- /Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,12 +13,10 @@
     />
     <!-- META-->
     <link rel="icon" href="/icons/logo-small.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
       content="ikapp gör det lätt att följa din ekonomi. Logga det du spenderar och tjänar, håll ordning med kategorier och se en klar översikt direkt."
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ikAPP</title>
   </head>
   <body>
@@ -26,7 +24,7 @@
     <header>
       <!-- Branding -->
       <div class="branding">
-        <a href="#">
+        <div class="logo" aria-hidden="true">
           <svg
             width="36"
             height="38"
@@ -67,89 +65,92 @@
               </clipPath>
             </defs>
           </svg>
-        </a>
+        </div>
+
         <h1>ikapp</h1>
       </div>
-      <div class="period">
-        <div class="period-nav" aria-label="Välj period">
-          <button type="button" class="period-btn" id="period-prev" aria-label="Föregående period">
-            <svg
-              width="14"
-              height="8"
-              viewBox="0 0 14 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="left"
-            >
-              <path
-                d="M13 1L7 7L1 1"
-                stroke="#03DDDD"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
-
-          <span class="period-label" id="period-label" aria-live="polite">Feb 2026</span>
-
-          <button type="button" class="period-btn" id="period-next" aria-label="Nästa period">
-            <svg
-              width="14"
-              height="8"
-              viewBox="0 0 14 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="right"
-            >
-              <path
-                d="M13 1L7 7L1 1"
-                stroke="#03DDDD"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
+      <!-- Select budget view -->
+      <div class="period-mode" role="group" aria-label="Visa period">
+        <button type="button" class="mode-btn is-active" aria-pressed="true" data-mode="month">
+          Månad
+        </button>
+        <button type="button" class="mode-btn" aria-pressed="false" data-mode="year">År</button>
       </div>
     </header>
     <!-- Main content -->
     <main>
       <!-- Balance summary -->
       <section class="balance-summary" aria-label="Balans för vald period">
-        <div class="summary-header">
-          <h2>Översikt</h2>
-          <div class="period-toggle" role="group" aria-label="Visa per">
+        <div class="period">
+          <div class="period-nav" role="group" aria-label="Välj period">
             <button
               type="button"
-              class="toggle-btn is-active"
-              id="toggle-month"
-              aria-pressed="true"
+              class="period-btn"
+              id="period-prev"
+              aria-label="Föregående period"
             >
-              Månad
+              <svg
+                width="14"
+                height="8"
+                viewBox="0 0 14 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="left"
+              >
+                <path
+                  d="M13 1L7 7L1 1"
+                  stroke="#03DDDD"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </button>
-            <button type="button" class="toggle-btn" id="toggle-year" aria-pressed="false">
-              År
+
+            <span class="period-label" id="period-label" aria-live="polite">Feb 2026</span>
+
+            <button type="button" class="period-btn" id="period-next" aria-label="Nästa period">
+              <svg
+                width="14"
+                height="8"
+                viewBox="0 0 14 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="right"
+              >
+                <path
+                  d="M13 1L7 7L1 1"
+                  stroke="#03DDDD"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </button>
           </div>
         </div>
         <div class="summary-wrapper">
-          <div class="balance-item">
-            <span class="balance-label">Saldo</span>
-            <span id="balance-saldo" class="balance-value">0kr</span>
+          <div class="summary-header">
+            <h2>Översikt</h2>
           </div>
-          <div class="balance-item">
-            <span class="balance-label">Utgifter</span>
-            <span id="balance-expense" class="balance-value">0kr</span>
-          </div>
-          <div class="balance-item">
-            <span class="balance-label">Sparat</span>
-            <span id="balance-savings" class="balance-value">0kr</span>
+          <div class="summary-balance-wrapper">
+            <div class="balance-item">
+              <span class="balance-label">Saldo</span>
+              <span id="balance-saldo" class="balance-value">0kr</span>
+            </div>
+            <div class="balance-item">
+              <span class="balance-label">Utgifter</span>
+              <span id="balance-expense" class="balance-value">0kr</span>
+            </div>
+            <div class="balance-item">
+              <span class="balance-label">Sparat</span>
+              <span id="balance-savings" class="balance-value">0kr</span>
+            </div>
           </div>
         </div>
       </section>
-      <!-- input area -->
+
+      <!-- Input area -->
       <section class="budget-posting">
         <h3 id="budget-input-title">Budgetpanel</h3>
         <div class="budget-inputs">
@@ -212,10 +213,13 @@
           </form>
         </div>
       </section>
+
       <!-- Enry view  -->
       <section class="entries">
         <div class="entries-tabs" role="tablist" aria-label="Välj översyn">
+          <!-- income tab -->
           <button
+            type="button"
             role="tab"
             id="tab-income"
             class="entries-tab"
@@ -224,8 +228,9 @@
           >
             Inkomster
           </button>
-
+          <!-- expenses tab -->
           <button
+            type="button"
             role="tab"
             id="tab-expense"
             class="entries-tab"
@@ -234,8 +239,9 @@
           >
             Utgifter
           </button>
-
+          <!-- savings tab -->
           <button
+            type="button"
             role="tab"
             id="tab-savings"
             class="entries-tab"

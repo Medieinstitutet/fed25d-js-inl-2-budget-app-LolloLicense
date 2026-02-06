@@ -10,8 +10,9 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 2rem auto;
+  margin: 1rem auto;
   max-width: 50rem;
+  padding-block: 1rem;
   h1 {
     color: $color-accent;
     font-size: $fs-h4;
@@ -21,28 +22,21 @@ header {
     align-items: center;
     gap: 0.5rem;
   }
-  .period {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    .period-nav {
-      display: flex;
-      align-items: center;
-      color: $color-light;
-      button {
-        background-color: transparent;
-        border: none;
-        padding: 1.2rem;
-        .left {
-          transform: rotate(90deg);
-        }
-        .right {
-          transform: rotate(-90deg);
-        }
-      }
+  .period-mode {
+    button {
+      padding: 0.5rem;
+      border: none;
+      background-color: $color-grey;
+      border-radius: 10px;
+      font-family: 'Josefin Sans';
+      font-size: $fs-body;
+    }
+    button.is-active {
+      background-color: $color-accent;
     }
   }
 }
+
 main {
   max-width: 50rem;
   margin: 0 auto;
@@ -53,40 +47,45 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin: 1rem 0 2rem 0;
-  border: 1px solid $color-accent;
-  padding: 1rem;
-  border-radius: 10px;
-  .summary-header {
+  margin: 0.5rem 0 2rem 0;
+  .period-nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    h2 {
-      color: $color-light;
-      font-size: $fs-h3;
-    }
-    .period-toggle {
-      display: flex;
-      justify-content: end;
-      gap: 1rem;
-      button {
-        font-size: $fs-body;
-        font-family: 'Josefin Sans';
-        background-color: $color-grey;
-        color: $color-dark;
-        border: none;
-        border-radius: 10px;
-        padding: 0.5rem;
-        .is-active {
-          background-color: $color-accent;
-        }
+    justify-content: center;
+    color: $color-light;
+    font-size: $fs-h4;
+    button {
+      background-color: transparent;
+      border: none;
+      padding: 1.2rem;
+      .left {
+        transform: rotate(90deg);
+      }
+      .right {
+        transform: rotate(-90deg);
       }
     }
   }
+
   .summary-wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
+    border: 1px solid $color-accent;
+    padding: 1rem;
+    border-radius: 10px;
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      h2 {
+        color: $color-light;
+        font-size: $fs-h4;
+        margin-bottom: 1rem;
+      }
+    }
+    .summary-balance-wrapper {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
 
     .balance-item {
       display: flex;
@@ -123,7 +122,7 @@ main {
   h3 {
     margin-left: 1rem;
     color: $color-light;
-    font-size: $fs-h3;
+    font-size: $fs-h4;
   }
   .budget-inputs {
     display: flex;
@@ -179,11 +178,12 @@ main {
       button {
         border-radius: 10px;
         font-family: 'Josefin Sans';
-        padding: 0.6rem;
+        height: 2.3rem;
+        line-height: 2.3;
+        padding-inline: 0.5rem;
         border: none;
         background-color: $color-accent;
         font-size: $fs-body;
-        line-height: 1.2;
       }
     }
 
@@ -201,6 +201,7 @@ main {
     }
   }
 }
+
 //Entrys
 .entries {
   margin-inline: auto;
@@ -209,7 +210,7 @@ main {
     position: relative;
     display: flex;
     justify-content: space-around;
-    margin: 2rem 0 1.5rem 0;
+    margin: 2rem 0 3rem 0;
 
     &::after {
       content: '';

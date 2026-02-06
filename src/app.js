@@ -6,18 +6,20 @@ let categories = null;
 //localStorage
 const LS_DB_ID = "ikapp_entries";
 // data
+const now = new Date();
 const state = {
   entries: [],
   activeTab: "income",
+
+  periodMode: "month",
+  periodYear: now.getFullYear(),
+  periodMonth: now.getMonth(),
 };
+
 //-----------------------------------------------------------
 //--------------------------HELPERS--------------------------
 //-----------------------------------------------------------
 
-//Create the date of added postentry
-function getTodayDate() {
-  return new Date().toDateString();
-}
 //Making the date pretty and swedish
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -61,6 +63,110 @@ function formatMoney(amount) {
   const sign = rounded < 0 ? "-" : "";
   return `${sign}${formatted} kr`;
 }
+//-----------------------------------------------------------
+//-----------------------PERIOD HELPERS----------------------
+//-----------------------------------------------------------
+
+// Create a stabil date string
+function formatDateKey(date) {
+  return date.toISOString().slice(0, 10);
+}
+//Create the date of added postentry
+function getTodayDate() {
+  return formatDateKey(new Date());
+}
+// function to count the month in increasing value
+function getMonthPeriodIndex(year, month) {
+  return year * 12 + month;
+}
+
+// Defining whats this period is / prevous period / future
+function getNowPeriodIndex() {
+  const currentDate = new Date();
+
+  if (state.periodMode === "month") {
+    return getMonthPeriodIndex(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+    );
+  }
+  // If user chooses to view full year :
+  return currentDate.getFullYear();
+}
+
+function getViewedPeriodIndex() {
+  if (state.periodMode === "month") {
+    return getMonthPeriodIndex(state.periodYear, state.periodMonth);
+  }
+  return state.periodYear;
+}
+
+function comparePeriod() {
+  const nowIndex = getNowPeriodIndex();
+  const viewedIndex = getViewedPeriodIndex();
+
+  if (viewedIndex === nowIndex) return "current";
+  return viewedIndex < nowIndex ? "past" : "future";
+}
+// Set the date for submitt post
+function getCreatedAtForNewEntry() {
+  const where = comparePeriod();
+  //if post is make real time - set todays date
+  if (where === "current") {
+    return getTodayDate();
+  }
+  // if user views past period, store entry on day one of that period
+  if (where === "past") {
+    const day =
+      state.periodMode === "month"
+        ? new Date(state.periodYear, state.periodMonth, 1)
+        : new Date(state.periodYear, 0, 1);
+    return formatDateKey(day);
+  }
+  // viewing future period - entrys not possible
+  return null;
+}
+// Period filter function
+function isEntryInViewedPeriod(entry) {
+  // splitting up the ["2026"(y),"02"(m), "01"]
+  const [y, m] = entry.createdAt.split("-").map(Number);
+  const entryYear = y;
+  const entryMonthIndex = m - 1;
+
+  if (state.periodMode === "year") {
+    return entryYear === state.periodYear;
+  }
+  return (
+    entryYear === state.periodYear && entryMonthIndex === state.periodMonth
+  );
+}
+
+//-----------------------------------------------------------
+//---------------------PERIOD MODE EVENTS--------------------
+//-----------------------------------------------------------
+
+// add click evenet to modebuttons in header
+function initPeriodModeBtns() {
+  const btns = document.querySelectorAll(".mode-btn");
+  if (!btns.length) return;
+
+  btns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode;
+      if (mode !== "month" && mode !== "year") return;
+
+      state.periodMode = mode;
+      // classes for UI
+      btns.forEach((b) => {
+        const isActive = b.dataset.mode === state.periodMode;
+        b.classList.toggle("is-active", isActive);
+        b.setAttribute("aria-pressed", String(isActive));
+      });
+      console.log("periodMode är nu:", state.periodMode);
+      refreshUIforPeriodChange();
+    });
+  });
+}
 
 //-----------------------------------------------------------
 //-----------------------LOCAL STORAGE STUFF-----------------
@@ -76,12 +182,22 @@ function saveEntriesToLocalStorage() {
 // takes the string and reverse it backs to array
 function loadEntriesFromLocalStorage() {
   const saved = localStorage.getItem(LS_DB_ID);
-  // if nothing is saved - return/stop
-  if (saved === null) {
-    return;
-  }
-  // parse = makes string to array with objects
-  state.entries = JSON.parse(saved);
+  if (saved === null) return;
+
+  const parsed = JSON.parse(saved);
+
+  state.entries = parsed.map((entry) => {
+    // Om createdAt redan är YYYY-MM-DD, behåll.
+    // Annars: försök parse:a och normalisera till YYYY-MM-DD.
+    const date = new Date(entry.createdAt);
+
+    return {
+      ...entry,
+      createdAt: Number.isNaN(date.getTime())
+        ? getTodayDate()
+        : formatDateKey(date),
+    };
+  });
 }
 
 //-----------------------------------------------------------
@@ -189,6 +305,12 @@ function onFormSubmit(event) {
   const categoryOk = categoryId !== "";
 
   if (!typeOk || !amountOk || !categoryOk) return;
+  // future post blocket and send info to user
+  const createdAt = getCreatedAtForNewEntry();
+  if (!createdAt) {
+    alert("Du kan inte logga framtida poster");
+    return;
+  }
   //inside entry
   const entry = {
     id: generateId(),
@@ -196,7 +318,7 @@ function onFormSubmit(event) {
     amount,
     categoryId,
     note,
-    createdAt: getTodayDate(),
+    createdAt,
   };
 
   state.entries.push(entry);
@@ -204,14 +326,37 @@ function onFormSubmit(event) {
   saveEntriesToLocalStorage();
   updateTotalAmount();
   updateBalanceSummary();
-  //   console.log("Ny entry:", entry);
   resetEntryFields(form);
 }
 // Totalamout function conects to the chosen type(income/expense)
 function getTotalAmountForType(type) {
   return state.entries
+    .filter(isEntryInViewedPeriod)
     .filter((entry) => entry.type === type)
     .reduce((sum, entry) => sum + entry.amount, 0);
+}
+// Period Label UI
+function updatePeriodLabel() {
+  const labelEl = document.querySelector("#period-label");
+  if (!labelEl) return;
+
+  // If year - show only 2026 ( Numbers)
+  if (state.periodMode === "year") {
+    labelEl.textContent = String(state.periodYear);
+    return;
+  }
+
+  // if month - show m + y
+  const date = new Date(state.periodYear, state.periodMonth, 1);
+  //formatting month to ex. feb
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    month: "short",
+    year: "numeric",
+  });
+  // make first letter capital -> Feb
+  const formatted = formatter.format(date);
+  const noDot = formatted.replace(".", "");
+  labelEl.textContent = noDot.charAt(0).toUpperCase() + noDot.slice(1);
 }
 // Balans summary
 function updateBalanceSummary() {
@@ -245,6 +390,7 @@ function updateBalanceSummary() {
     savingsEl.textContent = formatMoney(savingsTotal);
   }
 }
+
 // updating total amount and adds class for UX
 function updateTotalAmount() {
   const totalEl = document.querySelector("#total-amount");
@@ -330,6 +476,14 @@ function initTabs() {
   updateTabsUI();
 }
 
+//  INIT FUNCTION FOR UI
+function refreshUIforPeriodChange() {
+  renderAllEntries();
+  updateTotalAmount();
+  updateBalanceSummary();
+  updatePeriodLabel();
+}
+
 //-----------------------------------------------------------
 //-------------------------RENDER UI-------------------------
 //-----------------------------------------------------------
@@ -389,7 +543,7 @@ function renderAllEntries() {
   expenseList.innerHTML = "";
   savingsList.innerHTML = "";
   // renders all after checking all
-  state.entries.forEach((entry) => {
+  state.entries.filter(isEntryInViewedPeriod).forEach((entry) => {
     renderEntry(entry);
   });
 }
@@ -411,6 +565,8 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     initTabs();
     updateTotalAmount();
     updateBalanceSummary();
+    updatePeriodLabel();
+    initPeriodModeBtns();
   })
   .catch((err) => {
     console.error("Kunde inte ladda categories.json", err);
