@@ -121,7 +121,6 @@ main {
 // input area
 .budget-posting {
   h3 {
-    margin-left: 1rem;
     color: $color-light;
     font-size: $fs-h4;
   }
@@ -133,15 +132,16 @@ main {
     .entry-type {
       display: flex;
       align-items: center;
+      justify-content: space-evenly;
       gap: 1rem;
       border: 0;
       padding: 0;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       color: $color-light;
       font-size: $fs-h6;
     }
     .entry-fields {
-      margin-top: 1.5rem;
+      margin-top: 2rem;
       display: flex;
       align-items: center;
       justify-content: space-evenly;
@@ -172,10 +172,10 @@ main {
       }
       .amount-field {
         flex: 0 0 5.5rem;
-        max-width: 5rem;
       }
       .category {
-        min-width: 11rem;
+        width: 100%;
+        min-width: 10rem;
       }
     }
     .submit-field {
