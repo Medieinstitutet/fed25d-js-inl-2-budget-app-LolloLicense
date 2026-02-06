@@ -141,11 +141,12 @@ main {
       font-size: $fs-h6;
     }
     .entry-fields {
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      justify-content: space-evenly;
+      gap: 1rem;
+      row-gap: 0;
       width: 100%;
       flex-wrap: wrap;
 
@@ -174,7 +175,7 @@ main {
         max-width: 5rem;
       }
       .category {
-        min-width: 10.5rem;
+        min-width: 11rem;
       }
     }
     .submit-field {
