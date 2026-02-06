@@ -1,0 +1,20 @@
+{
+  "name": "fed25d-js-inl-2-budget-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint-format": "biome check --write",
+    "format": "npx prettier **/*.{html,css,scss,md,json} --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.13",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  }
+}
