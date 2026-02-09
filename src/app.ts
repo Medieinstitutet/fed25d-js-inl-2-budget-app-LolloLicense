@@ -178,7 +178,7 @@ function isEntryInViewedPeriod(entry: Entry): boolean {
 
 // add click evenet to modebuttons in header
 function initPeriodModeBtns() {
-  const btns = document.querySelectorAll(".mode-btn");
+  const btns = document.querySelectorAll<HTMLButtonElement>(".mode-btn");
   if (!btns.length) return;
 
   btns.forEach((btn) => {
@@ -201,8 +201,8 @@ function initPeriodModeBtns() {
 // Period nav Helpers
 // connection the buttons to to period state
 function initPeriodNavbtns() {
-  const prevBtn = document.querySelector("#period-prev");
-  const nextBtn = document.querySelector("#period-next");
+  const prevBtn = document.querySelector<HTMLButtonElement>("#period-prev");
+  const nextBtn = document.querySelector<HTMLButtonElement>("#period-next");
 
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
@@ -255,7 +255,7 @@ function loadEntriesFromLocalStorage() {
   const saved = localStorage.getItem(LS_DB_ID);
   if (saved === null) return;
 
-  const parsed = JSON.parse(saved);
+  const parsed = JSON.parse(saved) as Entry[];
   // always sends back a list with entries no undefined
   state.entries = parsed.map((entry) => {
     const createdAt = String(entry.createdAt || "");
@@ -285,7 +285,9 @@ function loadEntriesFromLocalStorage() {
 
 //Radiobuttons
 function getCheckedEntryType(): EntryType {
-  const checked = document.querySelector('input[name="entryType"]:checked');
+  const checked = document.querySelector<HTMLInputElement>(
+    'input[name="entryType"]:checked',
+  );
   const value = checked ? checked.value : "income";
 
   return value === "income" || value === "expense" || value === "savings"
@@ -295,7 +297,7 @@ function getCheckedEntryType(): EntryType {
 
 // get right categorylist for chosen radiobtn
 function fillCategorySelect(type: EntryType): void {
-  const select = document.querySelector("#category");
+  const select = document.querySelector<HTMLSelectElement>("#category");
   if (!select || !categories) return;
 
   // reset the placeholder
@@ -332,7 +334,7 @@ function initCategorySwitch(): void {
 
 //formsubmit ui
 function initFormSubmit() {
-  const form = document.querySelector("#entry-form");
+  const form = document.querySelector<HTMLFormElement>("#entry-form");
   if (!form) return;
 
   form.addEventListener("submit", onFormSubmit);
@@ -341,9 +343,9 @@ function initFormSubmit() {
 // function for delete buttons - event delegation
 // listitems renders by js therefor this function
 function initDeleteBtns() {
-  const incomeList = document.querySelector("#income-list");
-  const expenseList = document.querySelector("#expense-list");
-  const savingsList = document.querySelector("#savings-list");
+  const incomeList = document.querySelector<HTMLUListElement>("#income-list");
+  const expenseList = document.querySelector<HTMLUListElement>("#expense-list");
+  const savingsList = document.querySelector<HTMLUListElement>("#savings-list");
 
   if (incomeList) incomeList.addEventListener("click", onDeleteClick);
   if (expenseList) expenseList.addEventListener("click", onDeleteClick);
@@ -374,26 +376,32 @@ function deleteEntryById(entryId: string): void {
   //Updating UI ( list+ total amount + overview + periodlabel)
   refreshUIForPeriodChange();
 }
+// type guard
+function isEntryType(value: unknown): value is EntryType {
+  return value === "income" || value === "expense" || value === "savings";
+}
+
 // what to pull from submitted entry
 function onFormSubmit(event: SubmitEvent): void {
   event.preventDefault();
+  //clear old errormessage
   setFormError("");
+  //Checking so currentTarget is <form>
   const form = event.currentTarget;
   if (!(form instanceof HTMLFormElement)) return;
 
+  // check all formdata
   const fd = new FormData(form);
 
-  // telling TS that this const are our allowed EntryTypes
-  const typeValue = fd.get("entryType");
-
-  const type =
-    typeValue === "income" || typeValue === "expense" || typeValue === "savings"
-      ? typeValue
-      : null;
-  if (!type) {
+  // My radiobuttons
+  const typeRaw = fd.get("entryType");
+  if (!isEntryType(typeRaw)) {
     setFormError("Välj om det är inkomst, utgift eller sparande");
     return;
   }
+  // ts knows entryType is typeRaw
+  const type: EntryType = typeRaw;
+
   const amount = Number(fd.get("amount"));
   const categoryId = String(fd.get("category") || "");
   const note = String(fd.get("note") || "");
@@ -420,9 +428,8 @@ function onFormSubmit(event: SubmitEvent): void {
     return;
   }
 
-  //Inside entry
-  /** @type {Entry} */
-  const entry = {
+  //create entry  with right content
+  const entry: Entry = {
     id: generateId(),
     type,
     amount,
@@ -439,6 +446,7 @@ function onFormSubmit(event: SubmitEvent): void {
   //Clear the form fields
   resetEntryFields(form);
 }
+
 // Totalamout function conects to the chosen type(income/expense)
 function getTotalAmountForType(type: EntryType): number {
   return state.entries
@@ -446,6 +454,7 @@ function getTotalAmountForType(type: EntryType): number {
     .filter((entry) => entry.type === type)
     .reduce((sum, entry) => sum + entry.amount, 0);
 }
+
 // Period Label UI
 function updatePeriodLabel(): void {
   const labelEl = document.querySelector("#period-label");
@@ -469,6 +478,7 @@ function updatePeriodLabel(): void {
   const noDot = formatted.replace(".", "");
   labelEl.textContent = noDot.charAt(0).toUpperCase() + noDot.slice(1);
 }
+
 // Balans summary
 function updateBalanceSummary(): void {
   const saldoEl = document.querySelector("#balance-saldo");
@@ -611,13 +621,13 @@ function refreshUIForPeriodChange() {
 //-----------------------------------------------------------
 
 // Render list by chosen category
-function renderEntry(entry: Entry) {
+function renderEntry(entry: Entry): void {
   const listEl =
     entry.type === "income"
-      ? document.querySelector("#income-list")
+      ? document.querySelector<HTMLUListElement>("#income-list")
       : entry.type === "expense"
-        ? document.querySelector("#expense-list")
-        : document.querySelector("#savings-list");
+        ? document.querySelector<HTMLUListElement>("#expense-list")
+        : document.querySelector<HTMLUListElement>("#savings-list");
   if (!listEl) return;
 
   const category = findCategoryById(entry.categoryId);
@@ -676,7 +686,7 @@ function renderAllEntries(): void {
 
 fetch(`${import.meta.env.BASE_URL}data/categories.json`)
   .then((res) => res.json())
-  .then((data) => {
+  .then((data: CategoriesData) => {
     categories = data;
     initCategorySwitch();
     initFormSubmit();
