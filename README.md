@@ -104,6 +104,6 @@ querySelector<HTMLFormElement>() och event-typer (SubmitEvent, MouseEvent) utan 
 ### Resurser 
 MDN, dokumentation, olika forumtrådar samt AI som bollplank vid felsökning och struktur.
 
-#### Projekt av: Louise Sverkström :octocat:
+#### // Louise Sverkström :octocat:
 
 Tack för att du kikade förbi! 
