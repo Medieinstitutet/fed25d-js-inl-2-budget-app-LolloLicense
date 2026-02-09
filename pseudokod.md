@@ -34,7 +34,7 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 
 1. Sidan laddas in och läser in sparad budget från tidigare (loclaStorage)
 
-2. Månads buget inputs 
+2. Månads buget inputs
 
 - Användare kan lägga in inkomst / utgift (välja radiobutton) i inputfält
 - listan och uppdateras

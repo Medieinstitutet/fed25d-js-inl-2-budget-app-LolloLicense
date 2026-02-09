@@ -1,16 +1,28 @@
+import type { CategoriesData, Entry, EntryType } from "./models";
+
 //---------------------------------------------------------
 //--------------------------STATE--------------------------
 //---------------------------------------------------------
 
-let categories = null;
+let categories: CategoriesData | null = null;
 //localStorage
 const LS_DB_ID = "ikapp_entries";
 // data
 const now = new Date();
-const state = {
+
+type PeriodMode = "month" | "year";
+
+type State = {
+  entries: Entry[];
+  activeTab: EntryType;
+  periodMode: PeriodMode;
+  periodYear: number;
+  periodMonth: number;
+};
+
+const state: State = {
   entries: [],
   activeTab: "income",
-
   periodMode: "month",
   periodYear: now.getFullYear(),
   periodMonth: now.getMonth(),
@@ -21,7 +33,7 @@ const state = {
 //-----------------------------------------------------------
 
 //Making the date pretty and swedish
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString("sv-SE", {
     month: "numeric",
@@ -30,11 +42,12 @@ function formatDate(dateString) {
   });
 }
 // Generate ID for deletepost function
-function generateId() {
+function generateId(): string {
   return `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 }
 // Set Category ID
-function findCategoryById(categoryId) {
+function findCategoryById(categoryId: string) {
+  if (!categories) return undefined;
   return [
     ...categories.income,
     ...categories.expense,
@@ -42,17 +55,17 @@ function findCategoryById(categoryId) {
   ].find((category) => category.id === categoryId);
 }
 //reset entryfields(inputs/select) to default
-function resetEntryFields(form) {
-  const amountInput = form.querySelector("#amount");
-  const categorySelect = form.querySelector("#category");
-  const noteInput = form.querySelector("#note");
+function resetEntryFields(form: HTMLFormElement): void {
+  const amountInput = form.querySelector<HTMLInputElement>("#amount");
+  const categorySelect = form.querySelector<HTMLSelectElement>("#category");
+  const noteInput = form.querySelector<HTMLInputElement>("#note");
 
   if (amountInput) amountInput.value = "";
   if (noteInput) noteInput.value = "";
   if (categorySelect) categorySelect.selectedIndex = 0;
 }
 // Formatting amouts
-function formatMoney(amount) {
+function formatMoney(amount: number): string {
   if (!Number.isFinite(amount)) return "0 kr";
 
   const rounded = Math.round(amount);
@@ -64,8 +77,8 @@ function formatMoney(amount) {
   return `${sign}${formatted} kr`;
 }
 // Function for error message
-function setFormError(message) {
-  const el = document.querySelector("#form-error");
+function setFormError(message: string): void {
+  const el = document.querySelector<HTMLElement>("#form-error");
   if (!el) return;
 
   // if message is emtpy sting - hide and clear
@@ -85,23 +98,23 @@ function setFormError(message) {
 //-----------------------------------------------------------
 
 // Create a stabil date string
-function formatDateKey(date) {
+function formatDateKey(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 //Create the date of added postentry
-function getTodayDate() {
+function getTodayDate(): string {
   return formatDateKey(new Date());
 }
 // function to count the month in increasing value
-function getMonthPeriodIndex(year, month) {
+function getMonthPeriodIndex(year: number, month: number): number {
   return year * 12 + month;
 }
 
 // Defining whats this period is / prevous period / future
-function getNowPeriodIndex() {
+function getNowPeriodIndex(): number {
   const currentDate = new Date();
 
   if (state.periodMode === "month") {
@@ -113,14 +126,16 @@ function getNowPeriodIndex() {
   // If user chooses to view full year :
   return currentDate.getFullYear();
 }
-
+// calculates an index for the period user sees
 function getViewedPeriodIndex() {
+  // if user chooses month show month plus year
   if (state.periodMode === "month") {
     return getMonthPeriodIndex(state.periodYear, state.periodMonth);
   }
+  // if user chose year - show full year
   return state.periodYear;
 }
-
+// function to compare period and sets current | past | future
 function comparePeriod() {
   const nowIndex = getNowPeriodIndex();
   const viewedIndex = getViewedPeriodIndex();
@@ -129,7 +144,7 @@ function comparePeriod() {
   return viewedIndex < nowIndex ? "past" : "future";
 }
 // Set the date for submitt post
-function getCreatedAtForNewEntry() {
+function getCreatedAtForNewEntry(): string | null {
   const where = comparePeriod();
   //if post is make real time - set todays date
   if (where === "current") {
@@ -147,7 +162,7 @@ function getCreatedAtForNewEntry() {
   return null;
 }
 // Period filter function
-function isEntryInViewedPeriod(entry) {
+function isEntryInViewedPeriod(entry: Entry): boolean {
   // splitting up the ["2026"(y),"02"(m), "01"]
   const [y, m] = entry.createdAt.split("-").map(Number);
   const entryYear = y;
@@ -179,7 +194,7 @@ function initPeriodModeBtns() {
         b.setAttribute("aria-pressed", String(isActive));
       });
       console.log("periodMode är nu:", state.periodMode);
-      refreshUIforPeriodChange();
+      refreshUIForPeriodChange();
     });
   });
 }
@@ -192,19 +207,19 @@ function initPeriodNavbtns() {
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
       changeViewedPeriod(-1); //going back one step
-      refreshUIforPeriodChange();
+      refreshUIForPeriodChange();
     });
   }
   if (nextBtn) {
     nextBtn.addEventListener("click", () => {
       changeViewedPeriod(+1); //going forward one step
-      refreshUIforPeriodChange();
+      refreshUIForPeriodChange();
     });
   }
 }
 
 // changes periodlabel state
-function changeViewedPeriod(direction) {
+function changeViewedPeriod(direction: number): void {
   // if we chose year jump year/year on click
   if (state.periodMode === "year") {
     state.periodYear += direction;
@@ -269,7 +284,7 @@ function loadEntriesFromLocalStorage() {
 //-----------------------------------------------------------
 
 //Radiobuttons
-function getCheckedEntryType() {
+function getCheckedEntryType(): EntryType {
   const checked = document.querySelector('input[name="entryType"]:checked');
   const value = checked ? checked.value : "income";
 
@@ -279,7 +294,7 @@ function getCheckedEntryType() {
 }
 
 // get right categorylist for chosen radiobtn
-function fillCategorySelect(type) {
+function fillCategorySelect(type: EntryType): void {
   const select = document.querySelector("#category");
   if (!select || !categories) return;
 
@@ -302,16 +317,19 @@ function fillCategorySelect(type) {
   });
 }
 
-function initCategorySwitch() {
+function initCategorySwitch(): void {
   fillCategorySelect(getCheckedEntryType());
 
   // uppdates radio when changed
   document.querySelectorAll('input[name="entryType"]').forEach((radio) => {
     radio.addEventListener("change", () => {
-      fillCategorySelect(getCheckedEntryType());
+      const type = getCheckedEntryType();
+      fillCategorySelect(type);
+      setActiveTab(type);
     });
   });
 }
+
 //formsubmit ui
 function initFormSubmit() {
   const form = document.querySelector("#entry-form");
@@ -332,11 +350,14 @@ function initDeleteBtns() {
   if (savingsList) savingsList.addEventListener("click", onDeleteClick);
 }
 // Delete post
-function onDeleteClick(e) {
-  const btn = e.target.closest(".entry-delete");
+function onDeleteClick(e: MouseEvent): void {
+  const target = e.target;
+  if (!(target instanceof Element)) return;
+
+  const btn = target.closest<HTMLButtonElement>(".entry-delete");
   if (!btn) return;
 
-  const li = btn.closest("li");
+  const li = btn.closest<HTMLLIElement>("li");
   if (!li) return;
 
   const entryId = li.dataset.id;
@@ -345,22 +366,34 @@ function onDeleteClick(e) {
   deleteEntryById(entryId);
 }
 //removes the deleted entry from state + saves + rerenders
-function deleteEntryById(entryId) {
+function deleteEntryById(entryId: string): void {
   // removes the post from state
   state.entries = state.entries.filter((entry) => entry.id !== entryId);
   //Save to local storage
   saveEntriesToLocalStorage();
   //Updating UI ( list+ total amount + overview + periodlabel)
-  refreshUIforPeriodChange();
+  refreshUIForPeriodChange();
 }
 // what to pull from submitted entry
-function onFormSubmit(event) {
+function onFormSubmit(event: SubmitEvent): void {
   event.preventDefault();
   setFormError("");
   const form = event.currentTarget;
+  if (!(form instanceof HTMLFormElement)) return;
+
   const fd = new FormData(form);
 
-  const type = fd.get("entryType");
+  // telling TS that this const are our allowed EntryTypes
+  const typeValue = fd.get("entryType");
+
+  const type =
+    typeValue === "income" || typeValue === "expense" || typeValue === "savings"
+      ? typeValue
+      : null;
+  if (!type) {
+    setFormError("Välj om det är inkomst, utgift eller sparande");
+    return;
+  }
   const amount = Number(fd.get("amount"));
   const categoryId = String(fd.get("category") || "");
   const note = String(fd.get("note") || "");
@@ -374,9 +407,11 @@ function onFormSubmit(event) {
   // Form error message
   if (!amountOk) {
     setFormError("Glöm inte att fylla i ett belopp");
+    return;
   }
   if (!categoryOk) {
     setFormError("Kom ihåg att välja en kategori innan du lägger till");
+    return;
   }
   // future post blocket and send info to user
   const createdAt = getCreatedAtForNewEntry();
@@ -386,6 +421,7 @@ function onFormSubmit(event) {
   }
 
   //Inside entry
+  /** @type {Entry} */
   const entry = {
     id: generateId(),
     type,
@@ -399,19 +435,19 @@ function onFormSubmit(event) {
   // save to local storage
   saveEntriesToLocalStorage();
   //Updating UI ( list+ total amount + overview + periodlabel)
-  refreshUIforPeriodChange();
+  refreshUIForPeriodChange();
   //Clear the form fields
   resetEntryFields(form);
 }
 // Totalamout function conects to the chosen type(income/expense)
-function getTotalAmountForType(type) {
+function getTotalAmountForType(type: EntryType): number {
   return state.entries
     .filter(isEntryInViewedPeriod)
     .filter((entry) => entry.type === type)
     .reduce((sum, entry) => sum + entry.amount, 0);
 }
 // Period Label UI
-function updatePeriodLabel() {
+function updatePeriodLabel(): void {
   const labelEl = document.querySelector("#period-label");
   if (!labelEl) return;
 
@@ -434,7 +470,7 @@ function updatePeriodLabel() {
   labelEl.textContent = noDot.charAt(0).toUpperCase() + noDot.slice(1);
 }
 // Balans summary
-function updateBalanceSummary() {
+function updateBalanceSummary(): void {
   const saldoEl = document.querySelector("#balance-saldo");
   const expenseEl = document.querySelector("#balance-expense");
   const savingsEl = document.querySelector("#balance-savings");
@@ -467,7 +503,7 @@ function updateBalanceSummary() {
 }
 
 // updating total amount and adds class for UX
-function updateTotalAmount() {
+function updateTotalAmount(): void {
   const totalEl = document.querySelector("#total-amount");
   if (!totalEl) return;
 
@@ -484,13 +520,13 @@ function updateTotalAmount() {
 }
 
 // show/hide tabs+panels depending witch is chosen
-function updateTabsUI() {
-  const incomeTab = document.querySelector("#tab-income");
-  const expenseTab = document.querySelector("#tab-expense");
-  const savingsTab = document.querySelector("#tab-savings");
-  const incomePanel = document.querySelector("#panel-income");
-  const expensePanel = document.querySelector("#panel-expense");
-  const savingsPanel = document.querySelector("#panel-savings");
+function updateTabsUI(): void {
+  const incomeTab = document.querySelector<HTMLButtonElement>("#tab-income");
+  const expenseTab = document.querySelector<HTMLButtonElement>("#tab-expense");
+  const savingsTab = document.querySelector<HTMLButtonElement>("#tab-savings");
+  const incomePanel = document.querySelector<HTMLElement>("#panel-income");
+  const expensePanel = document.querySelector<HTMLElement>("#panel-expense");
+  const savingsPanel = document.querySelector<HTMLElement>("#panel-savings");
 
   // state
   const isIncome = state.activeTab === "income";
@@ -505,7 +541,7 @@ function updateTabsUI() {
   if (expenseTab) expenseTab.classList.toggle("is-active", isExpense);
   if (savingsTab) savingsTab.classList.toggle("is-active", isSavings);
 
-  const entriesEl = document.querySelector(".entries");
+  const entriesEl = document.querySelector<HTMLElement>(".entries");
   if (entriesEl) {
     entriesEl.classList.toggle("is-income-active", isIncome);
     entriesEl.classList.toggle("is-expense-active", isExpense);
@@ -522,6 +558,11 @@ function updateTabsUI() {
   if (savingsPanel) savingsPanel.toggleAttribute("hidden", !isSavings);
 
   updateTotalAmount();
+}
+// change to active tab when chosen entrytype change
+function setActiveTab(tab: EntryType): void {
+  state.activeTab = tab;
+  updateTabsUI();
 }
 
 // sets clickevent to typetabs
@@ -552,7 +593,7 @@ function initTabs() {
 }
 
 //  INIT FUNCTION FOR UI
-function refreshUIforPeriodChange() {
+function refreshUIForPeriodChange() {
   console.log(
     "refresh körs:",
     state.periodYear,
@@ -570,7 +611,7 @@ function refreshUIforPeriodChange() {
 //-----------------------------------------------------------
 
 // Render list by chosen category
-function renderEntry(entry) {
+function renderEntry(entry: Entry) {
   const listEl =
     entry.type === "income"
       ? document.querySelector("#income-list")
@@ -613,7 +654,7 @@ function renderEntry(entry) {
   listEl.appendChild(li);
 }
 // Render list after its loaded to local storage
-function renderAllEntries() {
+function renderAllEntries(): void {
   const incomeList = document.querySelector("#income-list");
   const expenseList = document.querySelector("#expense-list");
   const savingsList = document.querySelector("#savings-list");
@@ -644,7 +685,7 @@ fetch(`${import.meta.env.BASE_URL}data/categories.json`)
     loadEntriesFromLocalStorage();
 
     initTabs();
-    refreshUIforPeriodChange();
+    refreshUIForPeriodChange();
     initPeriodModeBtns();
     initPeriodNavbtns();
   })
