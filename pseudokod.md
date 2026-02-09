@@ -19,16 +19,17 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 - balans i skrift ( >=0 / <0)
 
 ## Interaktion
-
-- välj månad uppe i en swiper
-  - delfault är kopplat till dagens datum
+- välj vilken vy : Månad / år 
+- bläddra mellan år / månad och uppdatera entrys därefter
+  - delfault är kopplat till dagens datum och genom att antingen uppdatera sida eller bläddra till baka så fyller man i på dagens datum. 
+  - om man vill backlogga sin budget får posten första dagen i vald månad / år
 - lägg till inkomst / utgift
 - Efter submit av ny post ska inputs återställas till default
 - en list med entry posts renderas och togglar beroende på vilken tab som är vald ( inkomster - utgifter - sparande)
 - ta bort poster
 - sparas så att appen inte startar om på noll (localStorage)
 - hämta info från localStorage vid varje reload
-- en månads / år balans ska visas med en pie chart samt en generell balans
+- man kan se den valda periodens översikt i en inforuta samt kolla i tabs
 
 ### Flöde
 
@@ -37,8 +38,8 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 2. Månads buget inputs
 
 - Användare kan lägga in inkomst / utgift (välja radiobutton) i inputfält
-- listan och uppdateras
-- det evtuella månadshjulet uppdateras / balasen
+- listan och uppdateras och flyttar till rätt tabentry när man väljer radiobutton
+- balasen för vald type uppdateras och visas 
 - detta sparas i localStorage
 
 3. Radera poster

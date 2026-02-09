@@ -323,7 +323,11 @@ function initCategorySwitch(): void {
   fillCategorySelect(getCheckedEntryType());
 
   // uppdates radio when changed
-  document.querySelectorAll('input[name="entryType"]').forEach((radio) => {
+  const radios = document.querySelectorAll<HTMLInputElement>(
+    'input[name="entryType"]',
+  );
+
+  radios.forEach((radio) => {
     radio.addEventListener("change", () => {
       const type = getCheckedEntryType();
       fillCategorySelect(type);
@@ -407,11 +411,9 @@ function onFormSubmit(event: SubmitEvent): void {
   const note = String(fd.get("note") || "");
 
   // validation
-  const typeOk = type === "income" || type === "expense" || type === "savings";
   const amountOk = Number.isFinite(amount) && amount > 0;
   const categoryOk = categoryId !== "";
 
-  if (!typeOk) return;
   // Form error message
   if (!amountOk) {
     setFormError("Glöm inte att fylla i ett belopp");
@@ -577,28 +579,25 @@ function setActiveTab(tab: EntryType): void {
 
 // sets clickevent to typetabs
 function initTabs() {
-  const incomeTab = document.querySelector("#tab-income");
-  const expenseTab = document.querySelector("#tab-expense");
-  const savingsTab = document.querySelector("#tab-savings");
+  const incomeTab = document.querySelector<HTMLButtonElement>("#tab-income");
+  const expenseTab = document.querySelector<HTMLButtonElement>("#tab-expense");
+  const savingsTab = document.querySelector<HTMLButtonElement>("#tab-savings");
 
-  if (incomeTab) {
-    incomeTab.addEventListener("click", () => {
-      state.activeTab = "income";
-      updateTabsUI();
-    });
-  }
-  if (expenseTab) {
-    expenseTab.addEventListener("click", () => {
-      state.activeTab = "expense";
-      updateTabsUI();
-    });
-  }
-  if (savingsTab) {
-    savingsTab.addEventListener("click", () => {
-      state.activeTab = "savings";
-      updateTabsUI();
-    });
-  }
+  incomeTab?.addEventListener("click", () => {
+    state.activeTab = "income";
+    updateTabsUI();
+  });
+
+  expenseTab?.addEventListener("click", () => {
+    state.activeTab = "expense";
+    updateTabsUI();
+  });
+
+  savingsTab?.addEventListener("click", () => {
+    state.activeTab = "savings";
+    updateTabsUI();
+  });
+
   updateTabsUI();
 }
 
