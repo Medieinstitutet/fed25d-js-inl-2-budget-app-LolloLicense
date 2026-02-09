@@ -1,13 +1,12 @@
 
 # Hej & välkommen till din ekonomiska hjälpreda: ikapp :bank:
 
-![ikapp loggan](/screenshots/logo.png)
+![Logo](/screenshots/header-logo.png)
 
 En enkel budget-app där du kan logga inkomster, utgifter & sparande. Du ser dina poster kopplade till datum, kan lägga till en kommentar och får tydliga ikoner för varje kategori. Appen visar även totalsummor för vald typ och en översikt med saldo, utgifter och sparande. 
 
 🔗 Live demo: (https://medieinstitutet.github.io/fed25d-js-inl-2-budget-app-LolloLicense/)
 
-📦 Repo: (https://github.com/Medieinstitutet/fed25d-js-inl-2-budget-app-LolloLicense)
 
 ![Tablet view](/screenshots/tablet-view.png)
 
