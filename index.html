@@ -96,6 +96,7 @@
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 class="left"
+                aria-hidden="true"
               >
                 <path
                   d="M13 1L7 7L1 1"
@@ -117,6 +118,7 @@
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 class="right"
+                aria-hidden="true"
               >
                 <path
                   d="M13 1L7 7L1 1"
@@ -175,14 +177,14 @@
             <div class="entry-fields">
               <!-- Category field -->
               <div class="field">
-                <label for="category" class="sr-only">Kategori</label>
+                <label for="category" class="sr-only">Välj kategori</label>
                 <select class="category" name="category" id="category" required>
                   <option value="" disabled selected>Välj kategori</option>
                 </select>
               </div>
               <!-- Entry field amout -->
               <div class="field amount-field">
-                <label for="amount" class="sr-only">Belopp</label>
+                <label for="amount" class="sr-only">Skriv belopp</label>
                 <input
                   inputmode="decimal"
                   type="number"
@@ -196,7 +198,7 @@
               </div>
               <!-- note field -->
               <div class="field">
-                <label class="sr-only" for="note">Kommentar</label>
+                <label class="sr-only" for="note">Addera kommentar</label>
                 <input
                   class="note"
                   type="text"
@@ -211,6 +213,7 @@
                 <button type="submit" id="add-entry-btn">Lägg till</button>
               </div>
             </div>
+            <p id="form-error" class="form-error" role="alert" hidden></p>
           </form>
         </div>
       </section>

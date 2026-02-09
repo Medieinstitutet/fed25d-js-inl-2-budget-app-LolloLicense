@@ -213,6 +213,14 @@ main {
     }
   }
 }
+.form-error[hidden] {
+  display: none;
+}
+.form-error {
+  margin-top: 0.5rem;
+  color: $color-pink;
+  font-family: 'Josefin Sans';
+}
 
 //Entrys
 .entries {

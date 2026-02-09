@@ -29,7 +29,7 @@ function formatDate(dateString) {
     year: "numeric",
   });
 }
-// generate ID for deletepost function
+// Generate ID for deletepost function
 function generateId() {
   return `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 }
@@ -63,6 +63,23 @@ function formatMoney(amount) {
   const sign = rounded < 0 ? "-" : "";
   return `${sign}${formatted} kr`;
 }
+// Function for error message
+function setFormError(message) {
+  const el = document.querySelector("#form-error");
+  if (!el) return;
+
+  // if message is emtpy sting - hide and clear
+  if (!message) {
+    el.textContent = "";
+    el.hidden = true;
+    return;
+  }
+
+  // Else show error
+  el.textContent = message;
+  el.hidden = false;
+}
+
 //-----------------------------------------------------------
 //-----------------------PERIOD HELPERS----------------------
 //-----------------------------------------------------------
@@ -339,6 +356,7 @@ function deleteEntryById(entryId) {
 // what to pull from submitted entry
 function onFormSubmit(event) {
   event.preventDefault();
+  setFormError("");
   const form = event.currentTarget;
   const fd = new FormData(form);
 
@@ -352,14 +370,22 @@ function onFormSubmit(event) {
   const amountOk = Number.isFinite(amount) && amount > 0;
   const categoryOk = categoryId !== "";
 
-  if (!typeOk || !amountOk || !categoryOk) return;
+  if (!typeOk) return;
+  // Form error message
+  if (!amountOk) {
+    setFormError("Glöm inte att fylla i ett belopp");
+  }
+  if (!categoryOk) {
+    setFormError("Kom ihåg att välja en kategori innan du lägger till");
+  }
   // future post blocket and send info to user
   const createdAt = getCreatedAtForNewEntry();
   if (!createdAt) {
     alert("Du kan inte logga framtida poster");
     return;
   }
-  //inside entry
+
+  //Inside entry
   const entry = {
     id: generateId(),
     type,
