@@ -1,10 +1,10 @@
-import type { CategoriesData, Entry, EntryType } from "./models";
+import type { ICategoriesData, IEntry, EntryType } from "./models";
 
 //---------------------------------------------------------
 //--------------------------STATE--------------------------
 //---------------------------------------------------------
 
-let categories: CategoriesData | null = null;
+let categories: ICategoriesData | null = null;
 //localStorage
 const LS_DB_ID = "ikapp_entries";
 // data
@@ -13,7 +13,7 @@ const now = new Date();
 type PeriodMode = "month" | "year";
 
 type State = {
-  entries: Entry[];
+  entries: IEntry[];
   activeTab: EntryType;
   periodMode: PeriodMode;
   periodYear: number;
@@ -162,7 +162,7 @@ function getCreatedAtForNewEntry(): string | null {
   return null;
 }
 // Period filter function
-function isEntryInViewedPeriod(entry: Entry): boolean {
+function isEntryInViewedPeriod(entry: IEntry): boolean {
   // splitting up the ["2026"(y),"02"(m), "01"]
   const [y, m] = entry.createdAt.split("-").map(Number);
   const entryYear = y;
@@ -255,7 +255,7 @@ function loadEntriesFromLocalStorage() {
   const saved = localStorage.getItem(LS_DB_ID);
   if (saved === null) return;
 
-  const parsed = JSON.parse(saved) as Entry[];
+  const parsed = JSON.parse(saved) as IEntry[];
   // always sends back a list with entries no undefined
   state.entries = parsed.map((entry) => {
     const createdAt = String(entry.createdAt || "");
@@ -431,7 +431,7 @@ function onFormSubmit(event: SubmitEvent): void {
   }
 
   //create entry  with right content
-  const entry: Entry = {
+  const entry: IEntry = {
     id: generateId(),
     type,
     amount,
@@ -620,7 +620,7 @@ function refreshUIForPeriodChange() {
 //-----------------------------------------------------------
 
 // Render list by chosen category
-function renderEntry(entry: Entry): void {
+function renderEntry(entry: IEntry): void {
   const listEl =
     entry.type === "income"
       ? document.querySelector<HTMLUListElement>("#income-list")
@@ -685,7 +685,7 @@ function renderAllEntries(): void {
 
 fetch(`${import.meta.env.BASE_URL}data/categories.json`)
   .then((res) => res.json())
-  .then((data: CategoriesData) => {
+  .then((data: ICategoriesData) => {
     categories = data;
     initCategorySwitch();
     initFormSubmit();

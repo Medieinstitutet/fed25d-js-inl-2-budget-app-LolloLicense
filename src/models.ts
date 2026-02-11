@@ -4,21 +4,21 @@
 export type EntryType = "income" | "expense" | "savings";
 
 // sets the type for my categories (json)
-export interface Category {
+export interface ICategory {
   id: string;
   label: string;
   icon: string;
 }
 
 // categories data needs to have these 3 keys
-export interface CategoriesData {
-  income: Category[];
-  expense: Category[];
-  savings: Category[];
+export interface ICategoriesData {
+  income: ICategory[];
+  expense: ICategory[];
+  savings: ICategory[];
 }
 
 //What my entrypost intails when its saved in localstorage
-export interface Entry {
+export interface IEntry {
   id: string; // uniqe id for delete
   type: EntryType; // income | expense | savnings (EntryType)
   amount: number; // amout of money
@@ -27,4 +27,4 @@ export interface Entry {
   createdAt: string; // date YYYY-MM-DD
 }
 
-export type Entries = Entry[];
+export type Entries = IEntry[];
