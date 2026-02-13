@@ -19,9 +19,10 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 - balans i skrift ( >=0 / <0)
 
 ## Interaktion
-- välj vilken vy : Månad / år 
+
+- välj vilken vy : Månad / år
 - bläddra mellan år / månad och uppdatera entrys därefter
-  - delfault är kopplat till dagens datum och genom att antingen uppdatera sida eller bläddra till baka så fyller man i på dagens datum. 
+  - delfault är kopplat till dagens datum och genom att antingen uppdatera sida eller bläddra till baka så fyller man i på dagens datum.
   - om man vill backlogga sin budget får posten första dagen i vald månad / år
 - lägg till inkomst / utgift
 - Efter submit av ny post ska inputs återställas till default
@@ -39,7 +40,7 @@ Ett fält kopplat till en radio där men väljer utgift eller inkomst, om inkoms
 
 - Användare kan lägga in inkomst / utgift (välja radiobutton) i inputfält
 - listan och uppdateras och flyttar till rätt tabentry när man väljer radiobutton
-- balasen för vald type uppdateras och visas 
+- balasen för vald type uppdateras och visas
 - detta sparas i localStorage
 
 3. Radera poster
