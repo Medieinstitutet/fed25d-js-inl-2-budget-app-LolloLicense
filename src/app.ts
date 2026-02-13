@@ -46,7 +46,13 @@ function generateId(): string {
   return `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 }
 // Set Category ID
-function findCategoryById(categoryId: string) {
+function findCategoryById(categoryId: string):
+  | {
+      id: string;
+      label: string;
+      icon: string;
+    }
+  | undefined {
   if (!categories) return undefined;
   return [
     ...categories.income,
@@ -81,7 +87,7 @@ function setFormError(message: string): void {
   const el = document.querySelector<HTMLElement>("#form-error");
   if (!el) return;
 
-  // if message is emtpy sting - hide and clear
+  // if message is empty sting - hide and clear
   if (!message) {
     el.textContent = "";
     el.hidden = true;
@@ -97,7 +103,7 @@ function setFormError(message: string): void {
 //-----------------------PERIOD HELPERS----------------------
 //-----------------------------------------------------------
 
-// Create a stabil date string
+// Create a robust date string
 function formatDateKey(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -243,9 +249,9 @@ function changeViewedPeriod(direction: number): void {
 //-----------------------LOCAL STORAGE STUFF-----------------
 //-----------------------------------------------------------
 
-// make enteries array to string function
+// make entries array to string function
 function saveEntriesToLocalStorage() {
-  //acuallay makes the string
+  //actuallay makes the string
   const stringified = JSON.stringify(state.entries);
   // saves the strin
   localStorage.setItem(LS_DB_ID, stringified);
@@ -345,15 +351,12 @@ function initFormSubmit() {
 }
 
 // function for delete buttons - event delegation
-// listitems renders by js therefor this function
-function initDeleteBtns() {
-  const incomeList = document.querySelector<HTMLUListElement>("#income-list");
-  const expenseList = document.querySelector<HTMLUListElement>("#expense-list");
-  const savingsList = document.querySelector<HTMLUListElement>("#savings-list");
 
-  if (incomeList) incomeList.addEventListener("click", onDeleteClick);
-  if (expenseList) expenseList.addEventListener("click", onDeleteClick);
-  if (savingsList) savingsList.addEventListener("click", onDeleteClick);
+function initDeleteBtns() {
+  const entriesEl = document.querySelector<HTMLElement>(".entries");
+  if (!entriesEl) return;
+
+  entriesEl.addEventListener("click", onDeleteClick);
 }
 // Delete post
 function onDeleteClick(e: MouseEvent): void {
@@ -574,6 +577,14 @@ function updateTabsUI(): void {
 // change to active tab when chosen entrytype change
 function setActiveTab(tab: EntryType): void {
   state.activeTab = tab;
+  //sync radiobutton to formData gets right entryType
+  const radio = document.querySelector<HTMLInputElement>(
+    `input[name="entryType"][value="${tab}"]`,
+  );
+  if (radio) radio.checked = true;
+  //sync dropdown categories
+  fillCategorySelect(tab);
+  //Upd tab ui
   updateTabsUI();
 }
 
@@ -583,20 +594,9 @@ function initTabs() {
   const expenseTab = document.querySelector<HTMLButtonElement>("#tab-expense");
   const savingsTab = document.querySelector<HTMLButtonElement>("#tab-savings");
 
-  incomeTab?.addEventListener("click", () => {
-    state.activeTab = "income";
-    updateTabsUI();
-  });
-
-  expenseTab?.addEventListener("click", () => {
-    state.activeTab = "expense";
-    updateTabsUI();
-  });
-
-  savingsTab?.addEventListener("click", () => {
-    state.activeTab = "savings";
-    updateTabsUI();
-  });
+  incomeTab?.addEventListener("click", () => setActiveTab("income"));
+  expenseTab?.addEventListener("click", () => setActiveTab("expense"));
+  savingsTab?.addEventListener("click", () => setActiveTab("savings"));
 
   updateTabsUI();
 }
