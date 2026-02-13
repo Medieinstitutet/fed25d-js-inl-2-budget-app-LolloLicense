@@ -683,21 +683,53 @@ function renderAllEntries(): void {
 //-------------------------INITS & FETCH---------------------
 //-----------------------------------------------------------
 
-fetch(`${import.meta.env.BASE_URL}data/categories.json`)
-  .then((res) => res.json())
-  .then((data: ICategoriesData) => {
+// fetch(`${import.meta.env.BASE_URL}data/categories.json`)
+//   .then((res) => res.json())
+//   .then((data: ICategoriesData) => {
+//     categories = data;
+//     initCategorySwitch();
+//     initFormSubmit();
+//     initDeleteBtns();
+
+//     loadEntriesFromLocalStorage();
+
+//     initTabs();
+//     refreshUIForPeriodChange();
+//     initPeriodModeBtns();
+//     initPeriodNavbtns();
+//   })
+//   .catch((err) => {
+//     console.error("Kunde inte ladda categories.json", err);
+//   });
+
+// Testing async & await
+async function initApp(): Promise<void> {
+  try {
+    // fetch the categories from json first
+    // BASE_URL so fetch works both localy and on GitHub Pages
+    const res = await fetch(`${import.meta.env.BASE_URL}data/categories.json`);
+    if (!res.ok) {
+      // If pages missing - send 404
+      throw new Error(
+        `Kunde inte ladda categories.json (status ${res.status})`,
+      );
+    }
+    // Presumes that jsonfile matches ICategoriesData
+    const data = (await res.json()) as ICategoriesData;
     categories = data;
+    // init UI that need categories to be in place first
     initCategorySwitch();
+    // Connecting all the eventlisterners
     initFormSubmit();
     initDeleteBtns();
-
-    loadEntriesFromLocalStorage();
-
     initTabs();
-    refreshUIForPeriodChange();
     initPeriodModeBtns();
     initPeriodNavbtns();
-  })
-  .catch((err) => {
+    // Loading saved data and rendering UI
+    loadEntriesFromLocalStorage();
+    refreshUIForPeriodChange();
+  } catch (err: unknown) {
     console.error("Kunde inte ladda categories.json", err);
-  });
+  }
+}
+initApp();

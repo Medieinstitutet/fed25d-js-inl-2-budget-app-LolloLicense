@@ -330,3 +330,19 @@ main {
 .entries.is-savings-active .entries-tabs::after {
   transform: translateX(200%);
 }
+
+footer {
+  margin: 4rem 0 1rem 0;
+  .copyright {
+    color: $color-light;
+    font-weight: 300;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    a {
+      text-decoration: none;
+      color: $color-light;
+      padding-inline: 1rem;
+    }
+  }
+}
