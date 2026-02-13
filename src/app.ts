@@ -349,31 +349,6 @@ function initFormSubmit() {
 
   form.addEventListener("submit", onFormSubmit);
 }
-
-// function for delete buttons - event delegation
-
-function initDeleteBtns() {
-  const entriesEl = document.querySelector<HTMLElement>(".entries");
-  if (!entriesEl) return;
-
-  entriesEl.addEventListener("click", onDeleteClick);
-}
-// Delete post
-function onDeleteClick(e: MouseEvent): void {
-  const target = e.target;
-  if (!(target instanceof Element)) return;
-
-  const btn = target.closest<HTMLButtonElement>(".entry-delete");
-  if (!btn) return;
-
-  const li = btn.closest<HTMLLIElement>("li");
-  if (!li) return;
-
-  const entryId = li.dataset.id;
-  if (!entryId) return;
-
-  deleteEntryById(entryId);
-}
 //removes the deleted entry from state + saves + rerenders
 function deleteEntryById(entryId: string): void {
   // removes the post from state
@@ -660,6 +635,13 @@ function renderEntry(entry: IEntry): void {
         </button>
     </div> 
     `;
+  // choose this way to use my deletbuttons so no firefox warning..
+  const deleteBtn = li.querySelector<HTMLButtonElement>(".entry-delete");
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      deleteEntryById(entry.id);
+    });
+  }
   listEl.appendChild(li);
 }
 // Render list after its loaded to local storage
@@ -721,7 +703,6 @@ async function initApp(): Promise<void> {
     initCategorySwitch();
     // Connecting all the eventlisterners
     initFormSubmit();
-    initDeleteBtns();
     initTabs();
     initPeriodModeBtns();
     initPeriodNavbtns();
