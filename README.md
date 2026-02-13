@@ -60,6 +60,7 @@ Varje kategori har `id`, `label`, `icon` (svg i `public/icons/`)
 - Tydliga felmeddelanden i formulär visas med röd text.
 - UX-tänk rakt igenom: vyerna är tydliga och tabbningen funkar fint. Jag har rubber-duck testat appen på min extremt o-webbiga pappa och han lyckades navigera sig fram och börja logga sin budget.
 
+![Firefox analys](/screenshots/firefox-test.png)
 ![Lighthouse analys](/screenshots/lighthouse.png)
 ![HTML validation analys](/screenshots/validation-html.png)
 ![CSS validation analys](/screenshots/validation-css.png)
