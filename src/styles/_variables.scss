@@ -1,0 +1,21 @@
+// Colors
+$color-grey: #bab5c0;
+$color-light: #fefefe;
+$color-dark: #171717;
+$color-accent: #03dddd;
+
+$color-pink: #ff0066;
+$color-green: #36d88c;
+$color-yellow: #d6e71b;
+
+// Font Sizes
+// Base (du ville ha 1rem body)
+$fs-body: 1rem;
+
+// Headings
+$fs-h1: clamp(2.25rem, 1.8rem + 2.4vw, 3.5rem);
+$fs-h2: clamp(1.9rem, 1.6rem + 1.6vw, 2.8rem);
+$fs-h3: clamp(1.6rem, 1.35rem + 1.2vw, 2.2rem);
+$fs-h4: clamp(1.35rem, 1.2rem + 0.8vw, 1.8rem);
+$fs-h5: clamp(1.15rem, 1.05rem + 0.5vw, 1.45rem);
+$fs-h6: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
