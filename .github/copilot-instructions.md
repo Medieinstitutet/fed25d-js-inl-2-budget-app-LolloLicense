@@ -2,12 +2,11 @@
 description: "Specific rules for the code review agent on Pull Requests."
 excludeAgent: "coding" 
 ---
-# Copilot Grading Instructions for TypeScript Budget App Assignment
+# Copilot Review Instructions for TypeScript Budget App Assignment
 
-## Copilot required output requirements
-When generating a pull request summary, Copilot MUST produce a comment with the following markdown template:
+## Code Review Summary Instructions
+When providing a summary of a Pull Request review, strictly follow this format:
 
-```markdown
 ### A. Summary
 A short explanation of whether the assignment meets the requirements, outline below in this instruction document.
 
@@ -24,11 +23,9 @@ Provide actionable, constructive suggestions.
 PASS
 FAIL
 
-```
-
-Below are the instructions Copilot should consider when reviewing the pull request and assignment description:
-
 ## Assignment goal
+Below are the instructions Copilot should follow when reviewing the pull request and assignment description.
+
 Students must build a very simple budget application with Vite, in HTML, CSS and TypeScript. The app should allow a user to:
 - Add income and expense items through HTML input fields
 - Store each item with an amount and description in an object array
